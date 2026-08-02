@@ -12,6 +12,7 @@ import { ProfileCompletionDetail } from "@/components/candidate/profile-completi
 import { ProfilePictureManager } from "@/components/candidate/profile-picture-manager";
 import { ProfileBanner } from "@/components/candidate/profile-banner";
 import { ProfileForm } from "./profile-form";
+import { CandidateChangePasswordForm } from "@/components/candidate/change-password-form";
 import { ALERT_WARNING, DETAIL_SECTION, PAGE_STACK } from "@/lib/ui/classes";
 import { MotionFadeIn } from "@/components/candidate/ui/motion-wrapper";
 
@@ -84,9 +85,13 @@ export default async function CandidateProfilePage({
           <MotionFadeIn delay={0.1}>
             <ProfileDetailsForm details={details} />
           </MotionFadeIn>
+
+          <MotionFadeIn delay={0.15}>
+            <CandidateChangePasswordForm />
+          </MotionFadeIn>
         </div>
 
-        <MotionFadeIn delay={0.15}>
+        <MotionFadeIn delay={0.2}>
           <ProfileCompletionDetail completion={completion} />
         </MotionFadeIn>
       </div>

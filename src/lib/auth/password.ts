@@ -1,5 +1,6 @@
 /**
- * Shared password rules for HR change-password (client strength UI + server validation).
+ * Shared password rules for HR/candidate change & reset password flows
+ * (client strength UI + server validation).
  */
 
 export type PasswordRequirement = {

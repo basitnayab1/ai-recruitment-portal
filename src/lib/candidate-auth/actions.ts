@@ -3,8 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { requireCandidateUser } from "@/lib/candidate-auth/dal";
 import { ensureCandidateProfile } from "@/lib/candidate-auth/ensure-profile";
 import { sanitizeNextPath } from "@/lib/candidate-auth/next-path";
+import { validateNewPassword } from "@/lib/auth/password";
 import { notifyAccountCreated } from "@/lib/email/notifications";
 import { checkRateLimit, rateLimitKey } from "@/lib/security/rate-limit";
 import { getTrustedSiteOrigin } from "@/lib/security/site-origin";
@@ -209,4 +211,227 @@ export async function logout(): Promise<void> {
   const supabase = await createClient();
   await supabase.auth.signOut();
   redirect("/candidate/login");
+}
+
+export type ChangePasswordState =
+  | { status: "success"; message: string }
+  | { status: "error"; message: string }
+  | undefined;
+
+export type ForgotPasswordState =
+  | { status: "success"; message: string }
+  | { status: "error"; message: string }
+  | undefined;
+
+export type ResetPasswordState =
+  | { status: "success"; message: string }
+  | { status: "error"; message: string }
+  | undefined;
+
+function isNextRedirectError(error: unknown): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "digest" in error &&
+    typeof (error as { digest?: unknown }).digest === "string" &&
+    (error as { digest: string }).digest.startsWith("NEXT_REDIRECT")
+  );
+}
+
+/**
+ * Change the signed-in candidate's password after re-authenticating with
+ * the current password via Supabase Auth.
+ */
+export async function changeCandidatePassword(
+  _prevState: ChangePasswordState,
+  formData: FormData
+): Promise<ChangePasswordState> {
+  try {
+    const profile = await requireCandidateUser();
+
+    const currentPassword = String(formData.get("currentPassword") ?? "");
+    const newPassword = String(formData.get("newPassword") ?? "");
+    const confirmPassword = String(formData.get("confirmPassword") ?? "");
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      return { status: "error", message: "Please fill in all password fields." };
+    }
+    if (newPassword !== confirmPassword) {
+      return { status: "error", message: "New password and confirmation do not match." };
+    }
+    if (newPassword === currentPassword) {
+      return {
+        status: "error",
+        message: "New password must be different from your current password.",
+      };
+    }
+
+    const policyError = validateNewPassword(newPassword);
+    if (policyError) {
+      return { status: "error", message: policyError };
+    }
+
+    const limit = checkRateLimit({
+      key: rateLimitKey("candidate-change-password", profile.id),
+      limit: 5,
+      windowMs: 15 * 60 * 1000,
+      message: "Too many password change attempts. Please wait and try again.",
+    });
+    if (!limit.ok) {
+      return { status: "error", message: limit.message };
+    }
+
+    const supabase = await createClient();
+    const { error: reauthError } = await supabase.auth.signInWithPassword({
+      email: profile.email,
+      password: currentPassword,
+    });
+    if (reauthError) {
+      return { status: "error", message: "Current password is incorrect." };
+    }
+
+    const { error: updateError } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
+    if (updateError) {
+      console.error("[candidate-change-password] updateUser failed:", updateError.message);
+      return {
+        status: "error",
+        message: updateError.message || "Could not update your password. Please try again.",
+      };
+    }
+
+    return { status: "success", message: "Password updated successfully." };
+  } catch (error) {
+    if (isNextRedirectError(error)) throw error;
+    console.error("[candidate-change-password] unexpected error:", error);
+    return {
+      status: "error",
+      message: "Something went wrong while updating your password. Please try again.",
+    };
+  }
+}
+
+/**
+ * Send a Supabase password-recovery email for a candidate account.
+ * Always returns a generic success message to avoid email enumeration.
+ */
+export async function requestCandidatePasswordReset(
+  _prevState: ForgotPasswordState,
+  formData: FormData
+): Promise<ForgotPasswordState> {
+  try {
+    const email = String(formData.get("email") ?? "").trim().toLowerCase();
+    if (!email) {
+      return { status: "error", message: "Please enter your email address." };
+    }
+
+    const limit = checkRateLimit({
+      key: rateLimitKey("candidate-forgot-password", email),
+      limit: 5,
+      windowMs: 60 * 60 * 1000,
+      message: "Too many reset requests. Please try again later.",
+    });
+    if (!limit.ok) {
+      return { status: "error", message: limit.message };
+    }
+
+    let origin: string;
+    try {
+      origin = getTrustedSiteOrigin();
+    } catch {
+      return {
+        status: "error",
+        message: "Site URL is not configured. Set NEXT_PUBLIC_SITE_URL and try again.",
+      };
+    }
+
+    const supabase = await createClient();
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${origin}/auth/confirm?next=${encodeURIComponent("/candidate/reset-password")}`,
+    });
+
+    if (error) {
+      console.error("[candidate-forgot-password] resetPasswordForEmail failed:", error.message);
+    }
+
+    return {
+      status: "success",
+      message:
+        "If an account exists for that email, we've sent a password reset link. Check your inbox.",
+    };
+  } catch (error) {
+    console.error("[candidate-forgot-password] unexpected error:", error);
+    return {
+      status: "error",
+      message: "Something went wrong sending the reset email. Please try again.",
+    };
+  }
+}
+
+/**
+ * Set a new password for a candidate who arrived via the recovery email link
+ * (session already established by `/auth/confirm`).
+ */
+export async function resetCandidatePassword(
+  _prevState: ResetPasswordState,
+  formData: FormData
+): Promise<ResetPasswordState> {
+  try {
+    const newPassword = String(formData.get("newPassword") ?? "");
+    const confirmPassword = String(formData.get("confirmPassword") ?? "");
+
+    if (!newPassword || !confirmPassword) {
+      return { status: "error", message: "Please fill in both password fields." };
+    }
+    if (newPassword !== confirmPassword) {
+      return { status: "error", message: "New password and confirmation do not match." };
+    }
+
+    const policyError = validateNewPassword(newPassword);
+    if (policyError) {
+      return { status: "error", message: policyError };
+    }
+
+    const supabase = await createClient();
+    const { data: userData, error: userError } = await supabase.auth.getUser();
+    if (userError || !userData.user) {
+      return {
+        status: "error",
+        message: "This reset link is invalid or has expired. Please request a new one.",
+      };
+    }
+
+    const limit = checkRateLimit({
+      key: rateLimitKey("candidate-reset-password", userData.user.id),
+      limit: 5,
+      windowMs: 15 * 60 * 1000,
+      message: "Too many reset attempts. Please wait and try again.",
+    });
+    if (!limit.ok) {
+      return { status: "error", message: limit.message };
+    }
+
+    const { error: updateError } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
+    if (updateError) {
+      console.error("[candidate-reset-password] updateUser failed:", updateError.message);
+      return {
+        status: "error",
+        message: updateError.message || "Could not update your password. Please try again.",
+      };
+    }
+
+    return {
+      status: "success",
+      message: "Password updated successfully. You can continue using your account.",
+    };
+  } catch (error) {
+    console.error("[candidate-reset-password] unexpected error:", error);
+    return {
+      status: "error",
+      message: "Something went wrong while resetting your password. Please try again.",
+    };
+  }
 }

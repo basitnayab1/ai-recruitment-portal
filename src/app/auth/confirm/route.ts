@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import type { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { ensureCandidateProfile } from "@/lib/candidate-auth/ensure-profile";
+import { sanitizeNextPath } from "@/lib/candidate-auth/next-path";
 
 const DEFAULT_NEXT = "/candidate";
 
@@ -127,5 +128,7 @@ export async function GET(request: NextRequest) {
     await ensureCandidateProfile(supabase, user);
   }
 
-  redirect("/candidate");
+  // Honor `next` so recovery links can land on /candidate/reset-password
+  // (signup still defaults to /candidate).
+  redirect(sanitizeNextPath(next, DEFAULT_NEXT));
 }

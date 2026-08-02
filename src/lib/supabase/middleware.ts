@@ -4,7 +4,11 @@ import { NextResponse, type NextRequest } from "next/server";
 const HR_PROTECTED_PREFIX = "/hr";
 const HR_LOGIN_PATH = "/hr/login";
 const CANDIDATE_PROTECTED_PREFIX = "/candidate";
-const CANDIDATE_PUBLIC_PREFIXES = ["/candidate/login", "/candidate/signup"];
+const CANDIDATE_PUBLIC_PREFIXES = [
+  "/candidate/login",
+  "/candidate/signup",
+  "/candidate/forgot-password",
+];
 
 function isCandidatePublicPath(pathname: string): boolean {
   return CANDIDATE_PUBLIC_PREFIXES.some(
