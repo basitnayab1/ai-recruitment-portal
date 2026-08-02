@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { requireHRUser } from "@/lib/auth/dal";
 import { PageHeader } from "@/components/shared/page-header";
+import { ChangePasswordForm } from "@/components/hr/settings/change-password-form";
 import { DETAIL_SECTION, PAGE_STACK } from "@/lib/ui/classes";
 
 export const metadata: Metadata = {
@@ -44,6 +45,8 @@ export default async function HRSettingsPage() {
           </div>
         </dl>
       </div>
+
+      <ChangePasswordForm />
 
       <p className="text-sm text-zinc-400">
         Team management, notification preferences, and other settings are coming soon.
