@@ -6,7 +6,6 @@ import {
   getHRProfilePictureSignedUrlForCandidate,
   getHRProfilePictureSignedUrlsByCandidateIds,
 } from "@/lib/candidate/profile-picture-urls";
-import { getCandidateIdsWithProfilePictures } from "@/lib/candidate/profile-picture-data";
 import { isApplicationStatus, type ApplicationStatus } from "@/lib/hr/status";
 import { isEmploymentType, type EmploymentType } from "@/lib/hr/jobs";
 
@@ -256,10 +255,8 @@ export async function getHRApplications(filters: HRApplicationsFilters): Promise
   const candidateIds = [
     ...new Set(rows.map((row) => row.candidate_id).filter((id): id is string => Boolean(id))),
   ];
-  const pictureIds = await getCandidateIdsWithProfilePictures(candidateIds);
-  const pictureUrls = await getHRProfilePictureSignedUrlsByCandidateIds(
-    candidateIds.filter((id) => pictureIds.has(id))
-  );
+  // Single round-trip: signed URL map keys imply "has picture".
+  const pictureUrls = await getHRProfilePictureSignedUrlsByCandidateIds(candidateIds);
 
   const applications = rows.map((row) => ({
     id: row.id,
@@ -272,7 +269,7 @@ export async function getHRApplications(filters: HRApplicationsFilters): Promise
     status: isApplicationStatus(row.status) ? row.status : "new",
     submittedAt: row.submitted_at,
     hasResume: Boolean(row.cv_storage_path),
-    hasProfilePicture: row.candidate_id ? pictureIds.has(row.candidate_id) : false,
+    hasProfilePicture: row.candidate_id ? pictureUrls.has(row.candidate_id) : false,
     pictureUrl: row.candidate_id ? (pictureUrls.get(row.candidate_id) ?? null) : null,
   }));
 

@@ -100,6 +100,53 @@ export async function getCandidateInterviews(candidateId: string): Promise<Candi
 }
 
 export async function getCandidateUpcomingInterviews(candidateId: string): Promise<CandidateInterview[]> {
-  const interviews = await getCandidateInterviews(candidateId);
-  return interviews.filter((interview) => interview.status === "scheduled");
+  const supabase = await createClient();
+  const { appName } = getEmailConfig();
+  const today = new Date().toISOString().slice(0, 10);
+
+  const { data, error } = await supabase
+    .from("interviews")
+    .select(
+      `id, interviewer_name, interview_type, meeting_link, office_location,
+       interview_date, interview_time, timezone, duration_minutes, status,
+       jobs ( title, department )`
+    )
+    .eq("candidate_id", candidateId)
+    .eq("status", "scheduled")
+    .gte("interview_date", today)
+    .order("interview_date", { ascending: true })
+    .order("interview_time", { ascending: true });
+
+  if (error) {
+    console.error("[candidate/interview-data] Failed to load upcoming interviews:", error.message);
+    return [];
+  }
+
+  const rows = (data ?? []) as unknown as CandidateInterviewRow[];
+
+  return rows.map((row) => {
+    const interviewType = isInterviewType(row.interview_type) ? row.interview_type : "online";
+    const status = isInterviewStatus(row.status) ? row.status : "scheduled";
+    const timeValue = row.interview_time.length >= 5 ? row.interview_time.slice(0, 5) : row.interview_time;
+
+    return {
+      id: row.id,
+      jobTitle: row.jobs?.title ?? "Unknown role",
+      company: appName,
+      department: row.jobs?.department ?? null,
+      interviewerName: row.interviewer_name,
+      interviewType,
+      meetingLink: row.meeting_link,
+      officeLocation: row.office_location,
+      interviewDate: row.interview_date,
+      interviewDateLabel: formatEmailDate(row.interview_date),
+      interviewTime: timeValue,
+      interviewTimeLabel: formatEmailTime(timeValue),
+      timezone: row.timezone,
+      durationLabel: formatInterviewDuration(row.duration_minutes),
+      status,
+      statusLabel: INTERVIEW_STATUS_LABELS[status],
+      typeLabel: INTERVIEW_TYPE_LABELS[interviewType],
+    };
+  });
 }

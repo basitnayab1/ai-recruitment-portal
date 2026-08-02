@@ -63,19 +63,19 @@ export function ActivityLogTable({
 
           return (
             <tr key={log.id} className={TABLE_ROW}>
-              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-600 dark:text-zinc-400`}>
+              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-200`}>
                 <time dateTime={log.createdAt}>{formatDateTime(log.createdAt)}</time>
               </td>
-              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-900 dark:text-zinc-50`}>
+              <td className={`${TABLE_CELL} whitespace-nowrap text-white`}>
                 {log.metadata.actorName ??
                   (log.actorRole === "candidate" ? "Candidate" : "HR User")}
               </td>
               <td className={`${TABLE_CELL} whitespace-nowrap`}>
-                <span className="inline-flex rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                <span className="inline-flex rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-200 dark:bg-zinc-800">
                   {AUDIT_ACTION_LABELS[log.action]}
                 </span>
               </td>
-              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-600 dark:text-zinc-400`}>
+              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-200`}>
                 {candidateId && candidateName !== "—" ? (
                   <div className="flex items-center gap-2">
                     <CandidateAvatar
@@ -89,10 +89,10 @@ export function ActivityLogTable({
                   candidateName
                 )}
               </td>
-              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-600 dark:text-zinc-400`}>
+              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-200`}>
                 {log.metadata.jobTitle ?? "—"}
               </td>
-              <td className={`${TABLE_CELL} max-w-sm text-zinc-600 dark:text-zinc-400`}>
+              <td className={`${TABLE_CELL} max-w-sm text-zinc-200`}>
                 <p className="line-clamp-2">{log.metadata.details ?? log.description}</p>
               </td>
             </tr>

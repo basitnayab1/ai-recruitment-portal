@@ -5,9 +5,17 @@ export {
   SELECT_INPUT as SELECT_INPUT_CLASSNAME,
 } from "@/lib/ui/classes";
 
-/** Strip PostgREST `.or()` syntax characters from user search text. */
+/**
+ * Strip PostgREST filter / `.or()` syntax characters from user search text.
+ * Also bounds length to reduce abuse of filter strings.
+ */
 export function sanitizeSearchTerm(value: string): string {
-  return value.replace(/[,()]/g, " ").trim();
+  return value
+    .replace(/[,().*\\]/g, " ")
+    .replace(/[%_]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 100);
 }
 
 export function parsePageParam(value: string | undefined): number {

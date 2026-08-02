@@ -1,5 +1,6 @@
 import { getFeaturedJobs, getLandingStats } from "@/lib/public/landing-data";
 import { getLandingAuthState } from "@/lib/public/landing-auth";
+import { PremiumShell } from "@/components/atmosphere/premium-shell";
 import { SiteHeader } from "@/components/landing/site-header";
 import { Hero } from "@/components/landing/hero";
 import { StatsSection } from "@/components/landing/stats-section";
@@ -12,6 +13,8 @@ import { FAQ } from "@/components/landing/faq";
 import { FinalCTA } from "@/components/landing/final-cta";
 import { SiteFooter } from "@/components/landing/site-footer";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   const [jobs, stats, auth] = await Promise.all([
     getFeaturedJobs(),
@@ -20,10 +23,10 @@ export default async function Home() {
   ]);
 
   return (
-    <div className="flex flex-1 flex-col bg-white dark:bg-black">
+    <PremiumShell intensity="full" className="rb-page">
       <SiteHeader />
       <main className="flex-1">
-        <Hero auth={auth} />
+        <Hero auth={auth} stats={stats} featuredJobs={jobs} />
         <StatsSection stats={stats} />
         <FeaturedJobs jobs={jobs} />
         <WhyChooseUs />
@@ -34,6 +37,6 @@ export default async function Home() {
         <FinalCTA auth={auth} />
       </main>
       <SiteFooter />
-    </div>
+    </PremiumShell>
   );
 }

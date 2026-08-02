@@ -1,28 +1,51 @@
 import "server-only";
 
-import { isEmploymentType, type EmploymentType } from "@/lib/hr/jobs";
+import {
+  isEmploymentType,
+  isSeniorityLevel,
+  isWorkMode,
+  type EmploymentType,
+  type SeniorityLevel,
+  type WorkMode,
+} from "@/lib/hr/jobs";
+import { parseSkillsList } from "@/lib/hr/skill-match";
 
 export type JobFormValues = {
   title: string;
   department: string | null;
   location: string | null;
   employmentType: EmploymentType;
+  workMode: WorkMode | null;
+  isRemote: boolean;
+  summary: string | null;
   description: string;
-  requirements: string | null;
   responsibilities: string | null;
+  requirements: string | null;
+  benefits: string | null;
+  requiredSkills: string[];
+  preferredSkills: string[];
+  matchingKeywords: string[];
+  experienceRequired: string | null;
+  educationRequired: string | null;
+  seniorityLevel: SeniorityLevel | null;
   salaryMin: number | null;
   salaryMax: number | null;
-  isRemote: boolean;
-  closesAt: string | null; // ISO timestamp
+  openPositions: number;
+  closesAt: string | null;
+  hiringManager: string | null;
+  internalNotes: string | null;
 };
 
 export type JobFormFieldName =
   | "title"
   | "employmentType"
   | "description"
+  | "responsibilities"
+  | "requiredSkills"
   | "salaryMin"
   | "salaryMax"
-  | "closesAt";
+  | "closesAt"
+  | "openPositions";
 
 export type JobFormFieldErrors = Partial<Record<JobFormFieldName, string>>;
 
@@ -36,13 +59,16 @@ function optionalText(value: FormDataEntryValue | null): string | null {
 }
 
 /**
- * Validates and normalizes the shared job fields used by both the create and
- * edit forms. Mirrors the database's own check constraints (non-empty title
- * / description, non-negative salaries, max >= min) so invalid submissions
- * are caught with a friendly message before ever reaching Postgres.
+ * Validates shared job fields for create/edit.
+ * When `requirePublishFields` is true (publishing), enforces title,
+ * description, responsibilities, and required skills.
  */
-export function parseJobForm(formData: FormData): ParseJobFormResult {
+export function parseJobForm(
+  formData: FormData,
+  options: { requirePublishFields?: boolean } = {}
+): ParseJobFormResult {
   const fieldErrors: JobFormFieldErrors = {};
+  const requirePublish = options.requirePublishFields === true;
 
   const title = String(formData.get("title") ?? "").trim();
   if (!title) {
@@ -54,6 +80,18 @@ export function parseJobForm(formData: FormData): ParseJobFormResult {
     fieldErrors.description = "Description is required.";
   }
 
+  const responsibilities = optionalText(formData.get("responsibilities"));
+  const requiredSkills = parseSkillsList(String(formData.get("requiredSkills") ?? ""));
+
+  if (requirePublish) {
+    if (!responsibilities) {
+      fieldErrors.responsibilities = "Responsibilities are required to publish.";
+    }
+    if (requiredSkills.length === 0) {
+      fieldErrors.requiredSkills = "Add at least one required skill to publish.";
+    }
+  }
+
   const employmentTypeRaw = String(formData.get("employmentType") ?? "");
   const employmentType: EmploymentType | null = isEmploymentType(employmentTypeRaw)
     ? employmentTypeRaw
@@ -62,11 +100,27 @@ export function parseJobForm(formData: FormData): ParseJobFormResult {
     fieldErrors.employmentType = "Select a valid employment type.";
   }
 
+  const workModeRaw = String(formData.get("workMode") ?? "").trim();
+  const workMode: WorkMode | null = isWorkMode(workModeRaw) ? workModeRaw : null;
+  const isRemoteCheckbox = formData.get("isRemote") === "on";
+  const isRemote = workMode === "remote" || (!workMode && isRemoteCheckbox);
+
+  const seniorityRaw = String(formData.get("seniorityLevel") ?? "").trim();
+  const seniorityLevel: SeniorityLevel | null = isSeniorityLevel(seniorityRaw)
+    ? seniorityRaw
+    : null;
+
   const department = optionalText(formData.get("department"));
   const location = optionalText(formData.get("location"));
+  const summary = optionalText(formData.get("summary"));
   const requirements = optionalText(formData.get("requirements"));
-  const responsibilities = optionalText(formData.get("responsibilities"));
-  const isRemote = formData.get("isRemote") === "on";
+  const benefits = optionalText(formData.get("benefits"));
+  const experienceRequired = optionalText(formData.get("experienceRequired"));
+  const educationRequired = optionalText(formData.get("educationRequired"));
+  const hiringManager = optionalText(formData.get("hiringManager"));
+  const internalNotes = optionalText(formData.get("internalNotes"));
+  const preferredSkills = parseSkillsList(String(formData.get("preferredSkills") ?? ""));
+  const matchingKeywords = parseSkillsList(String(formData.get("matchingKeywords") ?? ""));
 
   const salaryMinRaw = String(formData.get("salaryMin") ?? "").trim();
   const salaryMaxRaw = String(formData.get("salaryMax") ?? "").trim();
@@ -87,6 +141,12 @@ export function parseJobForm(formData: FormData): ParseJobFormResult {
     salaryMax < salaryMin
   ) {
     fieldErrors.salaryMax = "Maximum salary must be greater than or equal to minimum.";
+  }
+
+  const openPositionsRaw = String(formData.get("openPositions") ?? "1").trim();
+  const openPositions = Number.parseInt(openPositionsRaw || "1", 10);
+  if (!Number.isFinite(openPositions) || openPositions < 1) {
+    fieldErrors.openPositions = "Enter at least 1 open position.";
   }
 
   const closesAtRaw = String(formData.get("closesAt") ?? "").trim();
@@ -111,13 +171,44 @@ export function parseJobForm(formData: FormData): ParseJobFormResult {
       department,
       location,
       employmentType,
+      workMode: workMode ?? (isRemote ? "remote" : null),
+      isRemote,
+      summary,
       description,
-      requirements,
       responsibilities,
+      requirements,
+      benefits,
+      requiredSkills,
+      preferredSkills,
+      matchingKeywords,
+      experienceRequired,
+      educationRequired,
+      seniorityLevel,
       salaryMin,
       salaryMax,
-      isRemote,
+      openPositions: Number.isFinite(openPositions) ? openPositions : 1,
       closesAt,
+      hiringManager,
+      internalNotes,
     },
   };
+}
+
+/** Check whether a stored job row is complete enough to publish. */
+export function getPublishBlockingErrors(job: {
+  title?: string | null;
+  description?: string | null;
+  responsibilities?: string | null;
+  required_skills?: string[] | null;
+}): JobFormFieldErrors {
+  const fieldErrors: JobFormFieldErrors = {};
+  if (!job.title?.trim()) fieldErrors.title = "Title is required.";
+  if (!job.description?.trim()) fieldErrors.description = "Description is required.";
+  if (!job.responsibilities?.trim()) {
+    fieldErrors.responsibilities = "Responsibilities are required to publish.";
+  }
+  if (!job.required_skills?.length) {
+    fieldErrors.requiredSkills = "Add at least one required skill to publish.";
+  }
+  return fieldErrors;
 }

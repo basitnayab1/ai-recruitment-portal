@@ -17,18 +17,28 @@ export type DeleteResumeState =
 
 const MAX_RESUME_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
 const PDF_MIME_TYPE = "application/pdf";
+const PDF_MAGIC = "%PDF-";
 
 function sanitizeFileName(name: string): string {
   const cleaned = name.replace(/[^a-zA-Z0-9._-]/g, "_");
-  return cleaned.slice(-100) || "resume.pdf";
+  const base = cleaned.slice(-100) || "resume.pdf";
+  return base.toLowerCase().endsWith(".pdf") ? base : `${base}.pdf`;
 }
 
 // Some browsers/OSes report an empty or generic `file.type` for a PDF
 // depending on how the file was created, so the extension is also checked
 // as a fallback — the upload is still always stored with `contentType:
 // "application/pdf"` regardless of what the browser reported.
-function isPdfFile(file: File): boolean {
-  return file.type === PDF_MIME_TYPE || file.name.toLowerCase().endsWith(".pdf");
+function hasPdfExtensionAndMime(file: File): boolean {
+  const nameOk = file.name.toLowerCase().endsWith(".pdf");
+  const mimeOk = !file.type || file.type === PDF_MIME_TYPE || file.type === "application/octet-stream";
+  return nameOk && mimeOk;
+}
+
+async function hasPdfMagicBytes(file: File): Promise<boolean> {
+  const header = new Uint8Array(await file.slice(0, 5).arrayBuffer());
+  const magic = String.fromCharCode(...header);
+  return magic === PDF_MAGIC;
 }
 
 /**
@@ -57,13 +67,20 @@ export async function uploadResume(
   if (file.size > MAX_RESUME_SIZE_BYTES) {
     return { status: "error", message: "Resume must be smaller than 5 MB." };
   }
-  if (!isPdfFile(file)) {
+  if (!hasPdfExtensionAndMime(file)) {
     return { status: "error", message: "Please upload a PDF file (.pdf)." };
   }
+  if (!(await hasPdfMagicBytes(file))) {
+    return {
+      status: "error",
+      message: "File content is not a valid PDF. Please upload a real PDF resume.",
+    };
+  }
 
+  const safeFileName = sanitizeFileName(file.name);
   const supabase = await createClient();
   const existing = await getCandidateResume(profile.id);
-  const storagePath = `${profile.id}/${Date.now()}-${sanitizeFileName(file.name)}`;
+  const storagePath = `${profile.id}/${Date.now()}-${safeFileName}`;
 
   const { error: uploadError } = await supabase.storage.from(RESUME_BUCKET).upload(storagePath, file, {
     contentType: PDF_MIME_TYPE,
@@ -81,7 +98,7 @@ export async function uploadResume(
     {
       candidate_id: profile.id,
       storage_path: storagePath,
-      file_name: file.name,
+      file_name: safeFileName,
       file_size: file.size,
       mime_type: PDF_MIME_TYPE,
       uploaded_at: new Date().toISOString(),
@@ -118,6 +135,8 @@ export async function deleteResume(
   _prevState: DeleteResumeState,
   _formData: FormData
 ): Promise<DeleteResumeState> {
+  void _prevState;
+  void _formData;
   const profile = await requireCandidateUser();
 
   const existing = await getCandidateResume(profile.id);

@@ -36,7 +36,7 @@ export function UpcomingInterviewsCard({
     <DashboardCardShell title="Upcoming Interviews" href="/hr/interviews" linkLabel="View all">
       {interviews.length === 0 ? (
         <div className="px-6 py-10">
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="text-sm text-zinc-400">
             Scheduled interviews with upcoming dates will appear here.
           </p>
         </div>
@@ -68,24 +68,24 @@ export function UpcomingInterviewsCard({
             <tbody className={TABLE_BODY}>
               {interviews.map((interview) => (
                 <tr key={interview.id} className={TABLE_ROW}>
-                  <td className={`${TABLE_CELL} font-medium whitespace-nowrap text-zinc-900 dark:text-zinc-50`}>
+                  <td className={`${TABLE_CELL} font-medium whitespace-nowrap text-white`}>
                     <Link
                       href={`/hr/applications/${interview.applicationId}`}
-                      className="transition-colors hover:text-zinc-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2 rounded-sm dark:hover:text-zinc-200"
+                      className="transition-colors hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2 rounded-sm"
                     >
                       {interview.candidateName}
                     </Link>
                   </td>
-                  <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-600 dark:text-zinc-400`}>
+                  <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-200`}>
                     {interview.jobTitle}
                   </td>
-                  <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-600 dark:text-zinc-400`}>
+                  <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-200`}>
                     {formatDate(interview.interviewDate)}
                   </td>
-                  <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-600 dark:text-zinc-400`}>
+                  <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-200`}>
                     {formatInterviewTime(interview.interviewTime)}
                   </td>
-                  <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-600 dark:text-zinc-400`}>
+                  <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-200`}>
                     {INTERVIEW_TYPE_LABELS[interview.interviewType]}
                   </td>
                   <td className={TABLE_CELL}>

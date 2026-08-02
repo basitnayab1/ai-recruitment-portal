@@ -6,6 +6,7 @@ import { getCandidateProfile } from "@/lib/candidate-auth/dal";
 import { getPublicJobById } from "@/lib/public/jobs-data";
 import { formatDate } from "@/lib/hr/format";
 import { EMPLOYMENT_TYPE_LABELS } from "@/lib/hr/jobs";
+import { PremiumShell } from "@/components/atmosphere/premium-shell";
 import { SiteHeader } from "@/components/landing/site-header";
 import { SiteFooter } from "@/components/landing/site-footer";
 import { ApplyLink } from "@/components/public/apply-link";
@@ -48,7 +49,7 @@ export default async function PublicJobDetailPage({ params }: { params: Promise<
   const isLoggedIn = Boolean(profile);
 
   return (
-    <div className="flex flex-1 flex-col bg-white dark:bg-black">
+    <PremiumShell intensity="full" className="rb-page">
       <SiteHeader />
       <main className="flex-1">
         <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
@@ -57,17 +58,19 @@ export default async function PublicJobDetailPage({ params }: { params: Promise<
             Back to all jobs
           </Link>
 
-          <div className={`mt-6 flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between ${DETAIL_SECTION}`}>
+          <div
+            className={`mt-6 flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between ${DETAIL_SECTION}`}
+          >
             <div>
               {job.department ? (
-                <span className="inline-flex rounded-full bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
+                <span className="inline-flex rounded-full border border-violet-400/25 bg-violet-500/15 px-3 py-1 text-xs font-medium text-violet-200">
                   {job.department}
                 </span>
               ) : null}
-              <h1 className="mt-3 text-2xl font-bold tracking-tight text-zinc-900 sm:text-3xl dark:text-zinc-50">
+              <h1 className="mt-3 text-2xl font-semibold tracking-tight text-white sm:text-3xl">
                 {job.title}
               </h1>
-              <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm text-zinc-500 dark:text-zinc-400">
+              <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm text-zinc-400">
                 <span className="inline-flex items-center gap-1.5">
                   <MapPin className="h-4 w-4" aria-hidden="true" />
                   {job.isRemote ? "Remote" : (job.location ?? "Location not specified")}
@@ -99,18 +102,50 @@ export default async function PublicJobDetailPage({ params }: { params: Promise<
           </div>
 
           <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
-            <div className="space-y-8 lg:col-span-2">
+            <div className={`space-y-8 lg:col-span-2 ${DETAIL_SECTION}`}>
               <section>
-                <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">Job Description</h2>
-                <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+                <h2 className="text-lg font-semibold text-white">Job Description</h2>
+                <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-zinc-400">
                   {job.description}
                 </p>
               </section>
 
+              {job.requiredSkills.length > 0 ? (
+                <section>
+                  <h2 className="text-lg font-semibold text-white">Required skills</h2>
+                  <ul className="mt-3 flex flex-wrap gap-2">
+                    {job.requiredSkills.map((skill) => (
+                      <li
+                        key={skill}
+                        className="rounded-full border border-violet-400/25 bg-violet-500/15 px-3 py-1 text-xs font-semibold text-violet-200"
+                      >
+                        {skill}
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ) : null}
+
+              {job.preferredSkills.length > 0 ? (
+                <section>
+                  <h2 className="text-lg font-semibold text-white">Preferred skills</h2>
+                  <ul className="mt-3 flex flex-wrap gap-2">
+                    {job.preferredSkills.map((skill) => (
+                      <li
+                        key={skill}
+                        className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-zinc-300"
+                      >
+                        {skill}
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ) : null}
+
               {job.responsibilities ? (
                 <section>
-                  <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">Responsibilities</h2>
-                  <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+                  <h2 className="text-lg font-semibold text-white">Responsibilities</h2>
+                  <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-zinc-400">
                     {job.responsibilities}
                   </p>
                 </section>
@@ -118,8 +153,8 @@ export default async function PublicJobDetailPage({ params }: { params: Promise<
 
               {job.requirements ? (
                 <section>
-                  <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">Requirements</h2>
-                  <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+                  <h2 className="text-lg font-semibold text-white">Requirements</h2>
+                  <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-zinc-400">
                     {job.requirements}
                   </p>
                 </section>
@@ -127,29 +162,27 @@ export default async function PublicJobDetailPage({ params }: { params: Promise<
             </div>
 
             <aside className={`space-y-5 lg:h-fit ${INSIGHT_TILE}`}>
-              <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">Job Overview</h2>
+              <h2 className="text-sm font-semibold text-white">Job Overview</h2>
               <dl className="space-y-3 text-sm">
                 <div className="flex justify-between gap-3">
-                  <dt className="text-zinc-500 dark:text-zinc-400">Department</dt>
-                  <dd className="text-right font-medium text-zinc-900 dark:text-zinc-50">
-                    {job.department ?? "—"}
-                  </dd>
+                  <dt className="text-zinc-400">Department</dt>
+                  <dd className="text-right font-medium text-white">{job.department ?? "—"}</dd>
                 </div>
                 <div className="flex justify-between gap-3">
-                  <dt className="text-zinc-500 dark:text-zinc-400">Location</dt>
-                  <dd className="text-right font-medium text-zinc-900 dark:text-zinc-50">
+                  <dt className="text-zinc-400">Location</dt>
+                  <dd className="text-right font-medium text-white">
                     {job.isRemote ? "Remote" : (job.location ?? "—")}
                   </dd>
                 </div>
                 <div className="flex justify-between gap-3">
-                  <dt className="text-zinc-500 dark:text-zinc-400">Employment Type</dt>
-                  <dd className="text-right font-medium text-zinc-900 dark:text-zinc-50">
+                  <dt className="text-zinc-400">Employment Type</dt>
+                  <dd className="text-right font-medium text-white">
                     {EMPLOYMENT_TYPE_LABELS[job.employmentType]}
                   </dd>
                 </div>
                 <div className="flex justify-between gap-3">
-                  <dt className="text-zinc-500 dark:text-zinc-400">Salary</dt>
-                  <dd className="text-right font-medium text-zinc-900 dark:text-zinc-50">
+                  <dt className="text-zinc-400">Salary</dt>
+                  <dd className="text-right font-medium text-white">
                     {salaryRange ?? "Not disclosed"}
                   </dd>
                 </div>
@@ -160,6 +193,6 @@ export default async function PublicJobDetailPage({ params }: { params: Promise<
         </div>
       </main>
       <SiteFooter />
-    </div>
+    </PremiumShell>
   );
 }

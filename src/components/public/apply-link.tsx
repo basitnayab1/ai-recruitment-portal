@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { BTN_PRIMARY } from "@/lib/ui/classes";
+import { cn } from "@/lib/utils";
 
 /**
  * Shared "Apply Now" gate used on both the job card and job detail page
@@ -22,9 +23,12 @@ export function ApplyLink({
     ? `/candidate/apply/${jobId}`
     : `/candidate/login?next=${encodeURIComponent(`/jobs/${jobId}`)}`;
 
+  const sizeClass =
+    size === "sm" ? "h-9 px-4 text-xs" : size === "lg" ? "h-12 px-7" : "h-11 px-5";
+
   return (
-    <Button asChild size={size} className={className}>
-      <Link href={href}>Apply Now</Link>
-    </Button>
+    <Link href={href} className={cn(BTN_PRIMARY, sizeClass, className)}>
+      Apply Now
+    </Link>
   );
 }

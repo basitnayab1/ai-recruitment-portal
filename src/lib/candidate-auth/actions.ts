@@ -1,25 +1,13 @@
 "use server";
 
-import { headers } from "next/headers";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ensureCandidateProfile } from "@/lib/candidate-auth/ensure-profile";
 import { sanitizeNextPath } from "@/lib/candidate-auth/next-path";
 import { notifyAccountCreated } from "@/lib/email/notifications";
-
-/**
- * Derives the app's own origin from the incoming request headers, so email
- * links (e.g. the signup confirmation link) always point at whichever host
- * actually served the request — localhost in dev, the real domain in
- * production — instead of a hardcoded or misconfigured value.
- */
-async function getRequestOrigin(): Promise<string> {
-  const headersList = await headers();
-  const host = headersList.get("x-forwarded-host") ?? headersList.get("host");
-  const protocol =
-    headersList.get("x-forwarded-proto") ?? (host?.startsWith("localhost") ? "http" : "https");
-  return `${protocol}://${host}`;
-}
+import { checkRateLimit, rateLimitKey } from "@/lib/security/rate-limit";
+import { getTrustedSiteOrigin } from "@/lib/security/site-origin";
 
 export type SignupState =
   | { status: "error"; message: string }
@@ -59,8 +47,26 @@ export async function signup(_prevState: SignupState, formData: FormData): Promi
     return { status: "error", message: "Password must be at least 8 characters." };
   }
 
+  const signupLimit = checkRateLimit({
+    key: rateLimitKey("candidate-signup", email),
+    limit: 5,
+    windowMs: 60 * 60 * 1000,
+    message: "Too many signup attempts. Please try again later.",
+  });
+  if (!signupLimit.ok) {
+    return { status: "error", message: signupLimit.message };
+  }
+
   const supabase = await createClient();
-  const origin = await getRequestOrigin();
+  let origin: string;
+  try {
+    origin = getTrustedSiteOrigin();
+  } catch {
+    return {
+      status: "error",
+      message: "Site URL is not configured. Set NEXT_PUBLIC_SITE_URL and try again.",
+    };
+  }
 
   const { data, error } = await supabase.auth.signUp({
     email,
@@ -105,6 +111,7 @@ export async function signup(_prevState: SignupState, formData: FormData): Promi
 
     await notifyAccountCreated({ email, candidateName: fullName });
 
+    revalidatePath("/");
     redirect("/candidate");
   }
 
@@ -125,6 +132,9 @@ export type LoginState = { error: string } | undefined;
  * session — `role` is always hard-coded to `"candidate"`, never supplied by
  * the client.
  *
+ * HR/admin accounts are rejected so they cannot obtain a candidate session
+ * or create a candidate_profiles row via this portal.
+ *
  * Redirects to the `next` hidden field when present (e.g. back to a job
  * detail page after gating "Apply Now"), falling back to `/candidate`.
  * `sanitizeNextPath` ensures this can never become an open redirect.
@@ -136,6 +146,16 @@ export async function login(_prevState: LoginState, formData: FormData): Promise
 
   if (!email || !password) {
     return { error: "Please enter both your email and password." };
+  }
+
+  const loginLimit = checkRateLimit({
+    key: rateLimitKey("candidate-login", email),
+    limit: 10,
+    windowMs: 15 * 60 * 1000,
+    message: "Too many login attempts. Please wait and try again.",
+  });
+  if (!loginLimit.ok) {
+    return { error: loginLimit.message };
   }
 
   const supabase = await createClient();
@@ -151,6 +171,23 @@ export async function login(_prevState: LoginState, formData: FormData): Promise
   if (userError || !user) {
     await supabase.auth.signOut();
     return { error: "Invalid email or password." };
+  }
+
+  // Block HR/admin from the candidate portal (defense in depth).
+  const { data: hrProfile } = await supabase
+    .from("profiles")
+    .select("role, is_active")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  const hrRow = hrProfile as { role: string; is_active: boolean } | null;
+  if (
+    hrRow &&
+    hrRow.is_active &&
+    (hrRow.role === "hr" || hrRow.role === "admin")
+  ) {
+    await supabase.auth.signOut();
+    return { error: "This account is for the HR portal. Please sign in at /hr/login." };
   }
 
   const { error: profileError } = await ensureCandidateProfile(supabase, user);

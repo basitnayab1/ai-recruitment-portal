@@ -72,31 +72,31 @@ export function ApplicationsTable({
                     size="md"
                   />
                   <div>
-                    <p className="font-medium text-zinc-900 dark:text-zinc-50">
+                    <p className="font-medium text-white">
                       {application.candidateName}
                     </p>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400">{application.email}</p>
+                    <p className="text-xs text-zinc-400">{application.email}</p>
                   </div>
                 </div>
               </td>
-              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-600 dark:text-zinc-400`}>
+              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-200`}>
                 {application.jobTitle}
               </td>
-              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-600 dark:text-zinc-400`}>
+              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-200`}>
                 {application.department ?? "—"}
               </td>
               <td className={TABLE_CELL}>
                 <StatusBadge status={application.status} />
               </td>
-              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-600 dark:text-zinc-400`}>
+              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-200`}>
                 {formatDate(application.submittedAt)}
               </td>
               <td className={`${TABLE_CELL} whitespace-nowrap`}>
                 <span
                   className={
                     application.hasResume
-                      ? "inline-flex items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-950/40 dark:text-green-300"
-                      : "inline-flex items-center rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400"
+                      ? "inline-flex items-center rounded-full border border-emerald-400/30 bg-emerald-500/15 px-2.5 py-0.5 text-xs font-medium text-emerald-300"
+                      : "inline-flex items-center rounded-full border border-white/10 bg-white/10 px-2.5 py-0.5 text-xs font-medium text-zinc-400"
                   }
                 >
                   {application.hasResume ? "Yes" : "No"}
@@ -105,7 +105,7 @@ export function ApplicationsTable({
               <td className={`${TABLE_CELL} text-right whitespace-nowrap`}>
                 <Link
                   href={`/hr/applications/${application.id}`}
-                  className="font-medium text-zinc-900 underline underline-offset-2 hover:no-underline dark:text-zinc-100"
+                  className="font-medium text-white underline underline-offset-2 hover:no-underline"
                 >
                   View Details
                 </Link>

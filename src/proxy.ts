@@ -11,8 +11,8 @@ export const config = {
   matcher: [
     /*
      * Run on every route except static assets, so the auth session is kept
-     * fresh everywhere. The actual `/hr` redirect logic inside
-     * `updateSession` only applies to `/hr/*` paths.
+     * fresh everywhere. `updateSession` pre-filters unauthenticated access
+     * to `/hr/*` and `/candidate/*` (public auth pages excluded).
      */
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],

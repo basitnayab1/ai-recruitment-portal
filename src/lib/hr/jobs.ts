@@ -15,9 +15,9 @@ export const JOB_STATUS_LABELS: Record<JobStatus, string> = {
 };
 
 export const JOB_STATUS_BADGE_CLASSNAME: Record<JobStatus, string> = {
-  draft: "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300",
-  published: "bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-300",
-  closed: "bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-300",
+  draft: "border border-white/15 bg-white/10 text-zinc-200",
+  published: "border border-emerald-400/30 bg-emerald-500/15 text-emerald-300",
+  closed: "border border-red-400/30 bg-red-500/15 text-red-300",
 };
 
 export const EMPLOYMENT_TYPES = [
@@ -39,4 +39,42 @@ export const EMPLOYMENT_TYPE_LABELS: Record<EmploymentType, string> = {
   contract: "Contract",
   internship: "Internship",
   temporary: "Temporary",
+};
+
+export const WORK_MODES = ["remote", "hybrid", "onsite"] as const;
+export type WorkMode = (typeof WORK_MODES)[number];
+
+export function isWorkMode(value: string): value is WorkMode {
+  return (WORK_MODES as readonly string[]).includes(value);
+}
+
+export const WORK_MODE_LABELS: Record<WorkMode, string> = {
+  remote: "Remote",
+  hybrid: "Hybrid",
+  onsite: "Onsite",
+};
+
+export const SENIORITY_LEVELS = [
+  "intern",
+  "junior",
+  "mid",
+  "senior",
+  "lead",
+  "manager",
+  "director",
+] as const;
+export type SeniorityLevel = (typeof SENIORITY_LEVELS)[number];
+
+export function isSeniorityLevel(value: string): value is SeniorityLevel {
+  return (SENIORITY_LEVELS as readonly string[]).includes(value);
+}
+
+export const SENIORITY_LEVEL_LABELS: Record<SeniorityLevel, string> = {
+  intern: "Intern",
+  junior: "Junior",
+  mid: "Mid-level",
+  senior: "Senior",
+  lead: "Lead",
+  manager: "Manager",
+  director: "Director",
 };

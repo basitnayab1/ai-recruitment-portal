@@ -74,24 +74,24 @@ export function InterviewsTable({
                     pictureSrc={interview.pictureUrl}
                     size="md"
                   />
-                  <span className="font-medium text-zinc-900 dark:text-zinc-50">
+                  <span className="font-medium text-white">
                     {interview.candidateName}
                   </span>
                 </div>
               </td>
-              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-600 dark:text-zinc-400`}>
+              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-200`}>
                 {interview.jobTitle}
               </td>
-              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-600 dark:text-zinc-400`}>
+              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-200`}>
                 {interview.interviewerName}
               </td>
-              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-600 dark:text-zinc-400`}>
+              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-200`}>
                 {INTERVIEW_TYPE_LABELS[interview.interviewType]}
               </td>
-              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-600 dark:text-zinc-400`}>
+              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-200`}>
                 {formatDate(interview.interviewDate)}
               </td>
-              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-600 dark:text-zinc-400`}>
+              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-200`}>
                 {interview.interviewTime}
               </td>
               <td className={TABLE_CELL}>
@@ -100,7 +100,7 @@ export function InterviewsTable({
               <td className={`${TABLE_CELL} text-right whitespace-nowrap`}>
                 <Link
                   href={`/hr/applications/${interview.applicationId}`}
-                  className="font-medium text-zinc-900 underline underline-offset-2 hover:no-underline dark:text-zinc-100"
+                  className="font-medium text-white underline underline-offset-2 hover:no-underline"
                 >
                   View application
                 </Link>

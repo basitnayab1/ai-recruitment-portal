@@ -11,18 +11,11 @@ export function LoginForm({ next }: { next?: string }) {
   const [state, formAction, pending] = useActionState(login, initialState);
 
   return (
-    <form
-      action={formAction}
-      className={`space-y-5 p-8 ${SURFACE_CARD}`}
-      noValidate
-    >
+    <form action={formAction} className={`space-y-5 p-8 ${SURFACE_CARD}`} noValidate>
       {next ? <input type="hidden" name="next" value={next} /> : null}
 
       <div className="space-y-2">
-        <label
-          htmlFor="email"
-          className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
-        >
+        <label htmlFor="email" className="block text-sm font-medium text-zinc-300">
           Email address
         </label>
         <input
@@ -38,10 +31,7 @@ export function LoginForm({ next }: { next?: string }) {
       </div>
 
       <div className="space-y-2">
-        <label
-          htmlFor="password"
-          className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
-        >
+        <label htmlFor="password" className="block text-sm font-medium text-zinc-300">
           Password
         </label>
         <input
@@ -59,26 +49,21 @@ export function LoginForm({ next }: { next?: string }) {
       {state?.error ? (
         <p
           role="alert"
-          className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950/40 dark:text-red-400"
+          className="rounded-xl border border-red-400/30 bg-red-500/10 px-3 py-2 text-sm text-red-300"
         >
           {state.error}
         </p>
       ) : null}
 
-      <button
-        type="submit"
-        disabled={pending}
-        aria-busy={pending}
-        className={`${BTN_PRIMARY} w-full`}
-      >
+      <button type="submit" disabled={pending} aria-busy={pending} className={`${BTN_PRIMARY} w-full`}>
         {pending ? "Signing in…" : "Sign in"}
       </button>
 
-      <p className="text-center text-sm text-zinc-500 dark:text-zinc-400">
+      <p className="text-center text-sm text-zinc-400">
         Don&apos;t have an account?{" "}
         <Link
           href="/candidate/signup"
-          className="font-medium text-zinc-900 underline underline-offset-2 hover:no-underline dark:text-zinc-100"
+          className="font-medium text-violet-300 underline underline-offset-2 hover:text-violet-200 hover:no-underline"
         >
           Sign up
         </Link>

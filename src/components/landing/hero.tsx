@@ -6,19 +6,27 @@ import { useState, type FormEvent } from "react";
 import { motion } from "framer-motion";
 import { Search, MapPin, ArrowRight, Sparkles } from "lucide-react";
 import type { LandingAuthState } from "@/lib/public/landing-auth";
+import type { FeaturedJob, LandingStats } from "@/lib/public/landing-data";
 import { HeroIllustration } from "@/components/landing/hero-illustration";
-import { BTN_PRIMARY, SURFACE_CARD } from "@/lib/ui/classes";
+import {
+  RB_BTN_GHOST,
+  RB_BTN_PRIMARY,
+  RB_EYEBROW,
+  RB_GLASS_STRONG,
+  RB_SUBTITLE,
+} from "@/lib/ui/premium";
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  visible: (delay: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] as const },
-  }),
-};
+const EASE = [0.22, 1, 0.36, 1] as const;
 
-export function Hero({ auth }: { auth: LandingAuthState }) {
+export function Hero({
+  auth,
+  stats,
+  featuredJobs,
+}: {
+  auth: LandingAuthState;
+  stats: LandingStats;
+  featuredJobs: FeaturedJob[];
+}) {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [location, setLocation] = useState("");
@@ -41,67 +49,48 @@ export function Hero({ auth }: { auth: LandingAuthState }) {
   }
 
   return (
-    <section className="relative flex min-h-[calc(100svh-4rem)] items-center overflow-hidden">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-indigo-50 via-white to-white dark:from-indigo-950/30 dark:via-black dark:to-black"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -top-24 right-[-10%] -z-10 h-[32rem] w-[32rem] rounded-full bg-violet-300/30 blur-3xl dark:bg-violet-700/20"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute bottom-[-10%] left-[-10%] -z-10 h-[28rem] w-[28rem] rounded-full bg-indigo-300/30 blur-3xl dark:bg-indigo-700/20"
-      />
-
-      <div className="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-16 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:px-8">
+    <section className="relative flex min-h-[calc(100svh-4.5rem)] items-center overflow-hidden">
+      <div className="relative mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-16 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:px-8">
         <div>
           <motion.div
-            initial="hidden"
-            animate="visible"
-            custom={0}
-            variants={fadeUp}
-            className="mb-6 inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700 dark:border-indigo-900 dark:bg-indigo-950/50 dark:text-indigo-300"
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: EASE }}
+            className={RB_EYEBROW}
           >
-            <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-            AI-Powered Recruitment Platform
+            <Sparkles className="h-3.5 w-3.5 text-violet-300" aria-hidden="true" />
+            AI Recruitment Experience
           </motion.div>
 
           <motion.h1
-            initial="hidden"
-            animate="visible"
-            custom={0.1}
-            variants={fadeUp}
-            className="text-4xl font-bold tracking-tight text-zinc-900 sm:text-5xl lg:text-6xl dark:text-zinc-50"
+            initial={{ opacity: 0, y: 22 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.08, ease: EASE }}
+            className="mt-7 text-5xl font-semibold tracking-[-0.04em] text-white sm:text-6xl lg:text-7xl"
           >
-            Find your next role,{" "}
-            <span className="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">
-              faster and smarter
-            </span>
+            Hire and get hired
+            <br />
+            <span className="rb-gradient-text">with cinematic AI</span>
           </motion.h1>
 
           <motion.p
-            initial="hidden"
-            animate="visible"
-            custom={0.2}
-            variants={fadeUp}
-            className="mt-6 max-w-xl text-lg leading-relaxed text-zinc-600 dark:text-zinc-400"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.65, delay: 0.16, ease: EASE }}
+            className={`mt-6 max-w-xl ${RB_SUBTITLE}`}
           >
-            AI-matched job recommendations, real-time application tracking, and a hiring team
-            that actually reviews your profile. Built for candidates who want a better job
-            search — and for teams who want better hires.
+            An immersive hiring workspace — AI matching, live pipelines, and a candidate
+            experience that feels as premium as the product you&apos;re building.
           </motion.p>
 
           <motion.form
-            initial="hidden"
-            animate="visible"
-            custom={0.3}
-            variants={fadeUp}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.65, delay: 0.24, ease: EASE }}
             onSubmit={handleSearch}
             role="search"
             aria-label="Search jobs"
-            className={`mt-8 flex flex-col gap-2 p-2 shadow-lg shadow-zinc-900/5 backdrop-blur sm:flex-row ${SURFACE_CARD} bg-white/90 dark:bg-zinc-950/90`}
+            className={`mt-9 flex flex-col gap-2 p-2 sm:flex-row ${RB_GLASS_STRONG}`}
           >
             <label className="flex flex-1 items-center gap-2 rounded-xl px-3 py-2.5">
               <Search className="h-4 w-4 shrink-0 text-zinc-400" aria-hidden="true" />
@@ -111,10 +100,10 @@ export function Hero({ auth }: { auth: LandingAuthState }) {
                 onChange={(event) => setTitle(event.target.value)}
                 placeholder="Job title or keyword"
                 aria-label="Job title or keyword"
-                className="w-full bg-transparent text-sm text-zinc-900 placeholder:text-zinc-400 outline-none dark:text-zinc-100"
+                className="w-full bg-transparent text-sm text-white placeholder:text-zinc-500 outline-none"
               />
             </label>
-            <div className="hidden w-px self-stretch bg-zinc-200 sm:block dark:bg-zinc-800" />
+            <div className="hidden w-px self-stretch bg-white/10 sm:block" />
             <label className="flex flex-1 items-center gap-2 rounded-xl px-3 py-2.5">
               <MapPin className="h-4 w-4 shrink-0 text-zinc-400" aria-hidden="true" />
               <input
@@ -123,44 +112,47 @@ export function Hero({ auth }: { auth: LandingAuthState }) {
                 onChange={(event) => setLocation(event.target.value)}
                 placeholder="Location"
                 aria-label="Location"
-                className="w-full bg-transparent text-sm text-zinc-900 placeholder:text-zinc-400 outline-none dark:text-zinc-100"
+                className="w-full bg-transparent text-sm text-white placeholder:text-zinc-500 outline-none"
               />
             </label>
-            <button type="submit" className={BTN_PRIMARY}>
-              Search Jobs
+            <button type="submit" className={`${RB_BTN_PRIMARY} h-11 px-5`}>
+              Search
             </button>
           </motion.form>
 
           <motion.div
-            initial="hidden"
-            animate="visible"
-            custom={0.4}
-            variants={fadeUp}
-            className="mt-6 flex flex-wrap items-center gap-4"
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.65, delay: 0.32, ease: EASE }}
+            className="mt-7 flex flex-wrap items-center gap-3"
           >
-            <Link
-              href="/jobs"
-              className="inline-flex items-center gap-2 rounded-full border border-zinc-300 px-5 py-2.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900"
-            >
-              Browse Jobs
+            <Link href={primaryCtaHref} className={RB_BTN_PRIMARY}>
+              {primaryCtaLabel}
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
-            <Link
-              href={primaryCtaHref}
-              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-indigo-600/25 transition-transform hover:scale-[1.03]"
-            >
-              {primaryCtaLabel}
+            <Link href="/jobs" className={RB_BTN_GHOST}>
+              Browse open roles
             </Link>
           </motion.div>
         </div>
 
         <motion.div
-          initial={{ opacity: 0, scale: 0.92, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-          className="hidden lg:block"
+          initial={{ opacity: 0, y: 28, scale: 0.96 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.85, delay: 0.18, ease: EASE }}
+          className="relative hidden lg:block"
         >
-          <HeroIllustration />
+          <div
+            aria-hidden="true"
+            className="absolute -inset-10 -z-10 rounded-[2.5rem] bg-gradient-to-br from-violet-500/30 via-fuchsia-500/10 to-cyan-400/20 blur-3xl"
+          />
+          <motion.div
+            animate={{ y: [0, -12, 0] }}
+            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+            className="overflow-hidden rounded-[1.75rem] border border-white/15 shadow-[0_30px_100px_rgba(0,0,0,0.55)] ring-1 ring-white/10"
+          >
+            <HeroIllustration stats={stats} featuredJobs={featuredJobs} />
+          </motion.div>
         </motion.div>
       </div>
     </section>

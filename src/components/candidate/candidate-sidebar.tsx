@@ -53,7 +53,7 @@ export function CandidateSidebar({
 
   return (
     <aside
-      className={`hr-sidebar-gradient fixed inset-y-0 left-0 z-30 flex flex-col border-r border-zinc-800/80 transition-all duration-300 ${
+      className={`fixed inset-y-0 left-0 z-30 flex flex-col border-r border-white/10 bg-[#0a0a12]/80 backdrop-blur-2xl transition-all duration-300 ${
         collapsed ? "w-[72px]" : "w-[260px]"
       }`}
       aria-label="Candidate navigation"
@@ -72,7 +72,7 @@ export function CandidateSidebar({
 
       <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-2 py-2">
         {!collapsed ? (
-          <p className="mb-2 px-3 text-[10px] font-bold tracking-widest text-zinc-600 uppercase">Menu</p>
+          <p className="mb-2 px-3 text-[10px] font-bold tracking-widest text-zinc-200 uppercase">Menu</p>
         ) : null}
         {NAV_ITEMS.map((item) => {
           const active = isActive(pathname, item.href, "exact" in item ? item.exact : false);
@@ -114,7 +114,7 @@ export function CandidateSidebar({
       </nav>
 
       {!collapsed ? (
-        <div className="mx-3 mb-3 rounded-2xl border border-zinc-800/80 bg-zinc-900/50 p-4">
+        <div className="mx-3 mb-3 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
           <div className="flex items-center gap-3">
             <CandidateAvatar name={fullName} pictureSrc={pictureUrl} size="sm" />
             <div className="min-w-0 flex-1">
@@ -140,7 +140,7 @@ export function CandidateSidebar({
         type="button"
         onClick={onToggleCollapse}
         aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-        className="mx-3 mb-4 flex h-9 items-center justify-center rounded-xl border border-zinc-800/80 bg-zinc-900/50 text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
+        className="mx-3 mb-4 flex h-9 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-zinc-400 transition-colors hover:bg-white/10 hover:text-zinc-200"
       >
         {collapsed ? (
           <ChevronRight className="h-4 w-4" aria-hidden="true" />

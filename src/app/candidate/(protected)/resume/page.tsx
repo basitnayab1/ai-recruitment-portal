@@ -49,10 +49,10 @@ export default async function CandidateResumePage({
 
       <MotionFadeIn>
         <div className={DETAIL_SECTION}>
-          <h2 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+          <h2 className="text-lg font-bold tracking-tight text-white">
             Current Resume
           </h2>
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="mt-1 text-sm text-zinc-400">
             {resume
               ? "This file will be submitted with your job applications."
               : "You haven't uploaded a resume yet."}
@@ -65,10 +65,10 @@ export default async function CandidateResumePage({
                   <FileText className="h-6 w-6 text-white" aria-hidden="true" />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-base font-bold text-zinc-900 dark:text-zinc-50">
+                  <p className="truncate text-base font-bold text-white">
                     {resume.fileName}
                   </p>
-                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                  <p className="text-sm text-zinc-400">
                     {fileSizeFormatter(resume.fileSize)} · Uploaded{" "}
                     {dateFormatter.format(new Date(resume.uploadedAt))}
                   </p>
@@ -88,7 +88,7 @@ export default async function CandidateResumePage({
             {safeNext && resume ? (
               <Link
                 href={safeNext}
-                className="inline-flex items-center gap-1.5 text-sm font-semibold text-violet-600 hover:underline dark:text-violet-400"
+                className="inline-flex items-center gap-1.5 text-sm font-semibold text-violet-600 hover:underline"
               >
                 Continue to job application
                 <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />

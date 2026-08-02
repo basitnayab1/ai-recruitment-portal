@@ -1,10 +1,13 @@
+"use client";
+
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { SURFACE_CARD } from "@/lib/ui/classes";
+import { FadeReveal } from "@/components/react-bits/fade-reveal";
+import { RB_GLASS_STRONG, RB_SECTION, RB_SUBTITLE } from "@/lib/ui/premium";
 
 const FAQS = [
   {
@@ -36,31 +39,35 @@ const FAQS = [
 
 export function FAQ() {
   return (
-    <section id="faq" className="scroll-mt-16 bg-zinc-50/60 py-24 dark:bg-zinc-950/40">
+    <section id="faq" className={`scroll-mt-20 ${RB_SECTION}`}>
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl dark:text-zinc-50">
+        <FadeReveal className="text-center">
+          <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
             Frequently Asked Questions
           </h2>
-          <p className="mt-4 text-lg text-zinc-600 dark:text-zinc-400">
+          <p className={`mt-4 ${RB_SUBTITLE}`}>
             Everything you need to know before you get started.
           </p>
-        </div>
+        </FadeReveal>
 
-        <div className={`mt-12 px-6 ${SURFACE_CARD}`}>
+        <FadeReveal delay={0.1} className={`mt-12 px-6 ${RB_GLASS_STRONG}`}>
           <Accordion type="single" collapsible className="w-full">
             {FAQS.map((faq, index) => (
-              <AccordionItem key={faq.question} value={`item-${index}`}>
-                <AccordionTrigger className="text-base font-medium text-zinc-900 dark:text-zinc-50">
+              <AccordionItem
+                key={faq.question}
+                value={`item-${index}`}
+                className="border-white/10"
+              >
+                <AccordionTrigger className="text-base font-medium text-white hover:no-underline hover:text-violet-200">
                   {faq.question}
                 </AccordionTrigger>
-                <AccordionContent className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+                <AccordionContent className="text-sm leading-relaxed text-zinc-400">
                   {faq.answer}
                 </AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>
-        </div>
+        </FadeReveal>
       </div>
     </section>
   );

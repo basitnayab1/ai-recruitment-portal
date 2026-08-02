@@ -1,4 +1,3 @@
-import Link from "next/link";
 import type { AnalyticsActivityItem } from "@/lib/hr/analytics/types";
 import { DashboardCardShell } from "@/components/shared/dashboard-card-shell";
 import { formatRelativeTime } from "@/lib/hr/format";
@@ -21,13 +20,12 @@ const ACTIVITY_COPY: Record<
 };
 
 const ACTIVITY_BADGE: Record<AnalyticsActivityItem["type"], string> = {
-  candidate_registered:
-    "bg-violet-50 text-violet-700 dark:bg-violet-950/40 dark:text-violet-300",
-  application_submitted: "bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300",
-  interview_scheduled: "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300",
-  interview_rescheduled: "bg-orange-50 text-orange-700 dark:bg-orange-950/40 dark:text-orange-300",
-  candidate_hired: "bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-300",
-  candidate_rejected: "bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-300",
+  candidate_registered: "border border-violet-400/30 bg-violet-500/15 text-violet-200",
+  application_submitted: "border border-blue-400/30 bg-blue-500/15 text-blue-200",
+  interview_scheduled: "border border-amber-400/30 bg-amber-500/15 text-amber-200",
+  interview_rescheduled: "border border-orange-400/30 bg-orange-500/15 text-orange-200",
+  candidate_hired: "border border-emerald-400/30 bg-emerald-500/15 text-emerald-200",
+  candidate_rejected: "border border-red-400/30 bg-red-500/15 text-red-300",
 };
 
 const ACTIVITY_LABEL: Record<AnalyticsActivityItem["type"], string> = {
@@ -44,16 +42,16 @@ export function AnalyticsActivityCard({ activity }: { activity: AnalyticsActivit
     <DashboardCardShell title="Recent Activity" href="/hr/applications" linkLabel="View applications">
       {activity.length === 0 ? (
         <div className="px-6 py-10">
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="text-sm text-zinc-400">
             Activity from candidates, applications, interviews, and hiring decisions will appear here.
           </p>
         </div>
       ) : (
-        <ul className="divide-y divide-zinc-100 dark:divide-zinc-800/80">
+        <ul className="divide-y divide-white/[0.06]">
           {activity.map((item) => (
             <li key={item.id} className="px-6 py-4">
               <div className="flex flex-wrap items-start justify-between gap-2">
-                <p className="text-sm text-zinc-900 dark:text-zinc-50">
+                <p className="text-sm text-white">
                   {ACTIVITY_COPY[item.type](item)}
                 </p>
                 <span
@@ -62,7 +60,7 @@ export function AnalyticsActivityCard({ activity }: { activity: AnalyticsActivit
                   {ACTIVITY_LABEL[item.type]}
                 </span>
               </div>
-              <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+              <p className="mt-1 text-xs text-zinc-400">
                 {formatRelativeTime(item.createdAt)}
               </p>
             </li>

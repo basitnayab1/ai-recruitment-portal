@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { Briefcase, MapPin, Clock, ArrowRight, DollarSign } from "lucide-react";
 import type { LatestJobSummary } from "@/lib/candidate/dashboard-data";
 import { formatDate } from "@/lib/hr/format";
@@ -17,20 +16,20 @@ function JobListingCard({ job }: { job: LatestJobSummary }) {
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 shadow-md shadow-violet-500/20">
             <Briefcase className="h-4 w-4 text-white" aria-hidden="true" />
           </div>
-          <span className="rounded-full bg-violet-100 px-2.5 py-0.5 text-[10px] font-bold text-violet-700 uppercase dark:bg-violet-950/50 dark:text-violet-300">
+          <span className="rounded-full bg-violet-100 px-2.5 py-0.5 text-[10px] font-bold text-violet-700 uppercase dark:bg-violet-950/50">
             {EMPLOYMENT_TYPE_LABELS[job.employmentType]}
           </span>
         </div>
 
-        <h3 className="mt-4 text-base font-bold text-zinc-900 dark:text-zinc-50">{job.title}</h3>
-        <p className="mt-1 text-xs font-medium text-zinc-500 dark:text-zinc-400">RecruitAI</p>
+        <h3 className="mt-4 text-base font-bold text-white">{job.title}</h3>
+        <p className="mt-1 text-xs font-medium text-zinc-400">RecruitAI</p>
 
         <div className="mt-3 flex flex-wrap gap-2">
-          <span className="inline-flex items-center gap-1 rounded-lg bg-zinc-100 px-2 py-1 text-xs text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
+          <span className="inline-flex items-center gap-1 rounded-lg bg-zinc-100 px-2 py-1 text-xs text-zinc-200 dark:bg-zinc-800">
             <MapPin className="h-3 w-3" aria-hidden="true" />
             {job.isRemote ? "Remote" : (job.location ?? "TBD")}
           </span>
-          <span className="inline-flex items-center gap-1 rounded-lg bg-zinc-100 px-2 py-1 text-xs text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
+          <span className="inline-flex items-center gap-1 rounded-lg bg-zinc-100 px-2 py-1 text-xs text-zinc-200 dark:bg-zinc-800">
             <Clock className="h-3 w-3" aria-hidden="true" />
             {job.postedAt ? formatDate(job.postedAt) : "New"}
           </span>
@@ -39,7 +38,7 @@ function JobListingCard({ job }: { job: LatestJobSummary }) {
         <div className="mt-auto flex items-center justify-between gap-3 border-t border-zinc-100 pt-4 dark:border-zinc-800">
           <Link
             href={`/jobs/${job.id}`}
-            className="inline-flex items-center gap-1 text-sm font-semibold text-violet-600 transition-colors hover:text-violet-700 dark:text-violet-400"
+            className="inline-flex items-center gap-1 text-sm font-semibold text-violet-600 transition-colors hover:text-violet-700"
           >
             View Details
             <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
@@ -60,7 +59,7 @@ export function LatestJobsCard({ jobs }: { jobs: LatestJobSummary[] }) {
   return (
     <div className={DASHBOARD_CARD}>
       <div className={CARD_HEADER}>
-        <h2 className="text-base font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+        <h2 className="text-base font-bold tracking-tight text-white">
           Recommended Jobs
         </h2>
         <Link href="/jobs" className={CARD_HEADER_LINK}>
@@ -71,10 +70,10 @@ export function LatestJobsCard({ jobs }: { jobs: LatestJobSummary[] }) {
       {jobs.length === 0 ? (
         <div className="px-6 py-12 text-center">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-100 dark:bg-emerald-950/40">
-            <DollarSign className="h-6 w-6 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+            <DollarSign className="h-6 w-6 text-emerald-300" aria-hidden="true" />
           </div>
-          <p className="mt-4 text-sm font-semibold text-zinc-900 dark:text-zinc-50">No open positions</p>
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Check back soon for new opportunities.</p>
+          <p className="mt-4 text-sm font-semibold text-white">No open positions</p>
+          <p className="mt-1 text-sm text-zinc-400">Check back soon for new opportunities.</p>
         </div>
       ) : (
         <MotionStagger className="grid grid-cols-1 gap-4 p-6 sm:grid-cols-2 lg:grid-cols-3">

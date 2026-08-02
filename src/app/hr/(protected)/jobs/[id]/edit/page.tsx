@@ -31,14 +31,14 @@ export default async function EditJobPage({
       <div>
         <Link
           href={`/hr/jobs/${job.id}`}
-          className="text-sm font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
+          className="text-sm font-medium text-zinc-500 hover:text-white"
         >
           ← Back to Job
         </Link>
-        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-white">
           Edit Job
         </h1>
-        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{job.title}</p>
+        <p className="mt-1 text-sm text-zinc-400">{job.title}</p>
       </div>
 
       <JobForm
@@ -50,13 +50,25 @@ export default async function EditJobPage({
           department: job.department ?? "",
           location: job.location ?? "",
           employmentType: job.employmentType,
+          workMode: job.workMode ?? "",
+          seniorityLevel: job.seniorityLevel ?? "",
+          experienceRequired: job.experienceRequired ?? "",
+          educationRequired: job.educationRequired ?? "",
+          summary: job.summary ?? "",
           description: job.description,
           requirements: job.requirements ?? "",
           responsibilities: job.responsibilities ?? "",
+          benefits: job.benefits ?? "",
+          requiredSkills: job.requiredSkills,
+          preferredSkills: job.preferredSkills,
+          matchingKeywords: job.matchingKeywords,
           salaryMin: job.salaryMin !== null ? String(job.salaryMin) : "",
           salaryMax: job.salaryMax !== null ? String(job.salaryMax) : "",
+          openPositions: String(job.openPositions ?? 1),
           isRemote: job.isRemote,
           closesAt: toDateInputValue(job.closesAt),
+          hiringManager: job.hiringManager ?? "",
+          internalNotes: job.internalNotes ?? "",
         }}
       />
     </div>

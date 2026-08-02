@@ -1,6 +1,5 @@
 import "server-only";
 
-import sharp from "sharp";
 import {
   ALLOWED_PROFILE_PICTURE_MIME_TYPES,
   PROFILE_PICTURE_MAX_DIMENSION,
@@ -55,29 +54,41 @@ export async function processProfilePicture(file: File): Promise<ProcessedProfil
     return null;
   }
 
-  const inputBuffer = Buffer.from(await file.arrayBuffer());
-  let pipeline = sharp(inputBuffer, { failOn: "none" }).rotate();
+  // Lazy-load sharp so unrelated server actions on the profile page are not
+  // crashed by a broken native sharp binary at module-eval time. Catch load
+  // failures too — an uncaught sharp DLOPEN error can kill the Next.js
+  // process and surface as "Failed to fetch" on later Server Actions.
+  try {
+    const sharp = (await import("sharp")).default;
 
-  const metadata = await pipeline.metadata();
-  const width = metadata.width ?? 0;
-  const height = metadata.height ?? 0;
+    const inputBuffer = Buffer.from(await file.arrayBuffer());
+    let pipeline = sharp(inputBuffer, { failOn: "none" }).rotate();
 
-  if (width > PROFILE_PICTURE_MAX_DIMENSION || height > PROFILE_PICTURE_MAX_DIMENSION) {
-    pipeline = pipeline.resize(PROFILE_PICTURE_MAX_DIMENSION, PROFILE_PICTURE_MAX_DIMENSION, {
-      fit: "inside",
-      withoutEnlargement: true,
-    });
+    const metadata = await pipeline.metadata();
+    const width = metadata.width ?? 0;
+    const height = metadata.height ?? 0;
+
+    if (width > PROFILE_PICTURE_MAX_DIMENSION || height > PROFILE_PICTURE_MAX_DIMENSION) {
+      pipeline = pipeline.resize(PROFILE_PICTURE_MAX_DIMENSION, PROFILE_PICTURE_MAX_DIMENSION, {
+        fit: "inside",
+        withoutEnlargement: true,
+      });
+    }
+
+    const buffer = await pipeline.webp({ quality: 85 }).toBuffer();
+    const mimeType: AllowedProfilePictureMimeType = "image/webp";
+    const baseName = file.name.replace(/\.[^.]+$/, "") || "profile-picture";
+    const sanitizedBaseName =
+      baseName.replace(/[^a-zA-Z0-9._-]/g, "_").slice(-80) || "profile-picture";
+
+    return {
+      buffer,
+      mimeType,
+      fileName: `${sanitizedBaseName}.${extensionForMimeType(mimeType)}`,
+      fileSize: buffer.byteLength,
+    };
+  } catch (error) {
+    console.error("[candidate/profile-picture-process] sharp processing failed:", error);
+    return null;
   }
-
-  const buffer = await pipeline.webp({ quality: 85 }).toBuffer();
-  const mimeType: AllowedProfilePictureMimeType = "image/webp";
-  const baseName = file.name.replace(/\.[^.]+$/, "") || "profile-picture";
-  const sanitizedBaseName = baseName.replace(/[^a-zA-Z0-9._-]/g, "_").slice(-80) || "profile-picture";
-
-  return {
-    buffer,
-    mimeType,
-    fileName: `${sanitizedBaseName}.${extensionForMimeType(mimeType)}`,
-    fileSize: buffer.byteLength,
-  };
 }

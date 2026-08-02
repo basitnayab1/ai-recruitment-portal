@@ -5,7 +5,9 @@ import {
   getHRProfilePictureSignedUrlForCandidate,
   getHRProfilePictureSignedUrlsByCandidateIds,
 } from "@/lib/candidate/profile-picture-urls";
+import { getLatestResumeAnalysisForCandidate } from "@/lib/hr/resume-analysis-data";
 import { HR_LIST_PAGE_SIZE, sanitizeSearchTerm } from "@/lib/hr/search/constants";
+import type { ResumeAnalysis } from "@/lib/ai/types";
 import { isApplicationStatus, type ApplicationStatus } from "@/lib/hr/status";
 import {
   isGender,
@@ -99,8 +101,10 @@ export type HRCandidateDetail = {
     yearsOfExperience: number | null;
     highestQualification: HighestQualification | null;
     currentCompany: string | null;
+    currentSalary: number | null;
     expectedSalary: number | null;
     noticePeriod: NoticePeriod | null;
+    skills: string[];
     linkedinUrl: string | null;
     portfolioUrl: string | null;
     githubUrl: string | null;
@@ -110,6 +114,11 @@ export type HRCandidateDetail = {
     fileName: string;
     fileSize: number;
     uploadedAt: string;
+  } | null;
+  resumeAnalysis: {
+    analysis: ResumeAnalysis;
+    jobTitle: string;
+    updatedAt: string;
   } | null;
   hasProfilePicture: boolean;
   pictureUrl: string | null;
@@ -141,8 +150,10 @@ type ProfileDetailsRow = {
   years_of_experience: number | null;
   highest_qualification: string | null;
   current_company: string | null;
+  current_salary: number | null;
   expected_salary: number | null;
   notice_period: string | null;
+  skills: string[] | null;
   linkedin_url: string | null;
   portfolio_url: string | null;
   github_url: string | null;
@@ -217,39 +228,64 @@ async function findCandidateIdsBySkillSearch(
   supabase: Awaited<ReturnType<typeof createClient>>,
   q: string
 ): Promise<string[]> {
-  const { data: skills, error: skillsError } = await supabase
-    .from("skills")
-    .select("application_id")
-    .ilike("skill_name", `%${q}%`);
+  const qLower = q.toLowerCase();
 
-  if (skillsError) {
-    console.error("[hr/candidates-data] Failed to search skills:", skillsError.message);
-    return [];
+  const [appSkillsResult, profileSkillsResult] = await Promise.all([
+    supabase.from("skills").select("application_id").ilike("skill_name", `%${q}%`),
+    supabase
+      .from("candidate_profile_details")
+      .select("candidate_id, skills")
+      .not("skills", "eq", "{}"),
+  ]);
+
+  if (appSkillsResult.error) {
+    console.error("[hr/candidates-data] Failed to search skills:", appSkillsResult.error.message);
+  }
+  if (profileSkillsResult.error) {
+    console.error(
+      "[hr/candidates-data] Failed to search profile skills:",
+      profileSkillsResult.error.message
+    );
   }
 
-  const applicationIds = (skills ?? []).map((row) => (row as { application_id: string }).application_id);
-  if (applicationIds.length === 0) {
-    return [];
+  const ids = new Set<string>();
+
+  for (const row of (profileSkillsResult.data ?? []) as {
+    candidate_id: string;
+    skills: string[] | null;
+  }[]) {
+    if (
+      Array.isArray(row.skills) &&
+      row.skills.some((skill) => skill.toLowerCase().includes(qLower))
+    ) {
+      ids.add(row.candidate_id);
+    }
   }
 
-  const { data: applications, error: applicationsError } = await supabase
-    .from("applications")
-    .select("candidate_id")
-    .in("id", applicationIds)
-    .not("candidate_id", "is", null);
+  const applicationIds = (appSkillsResult.data ?? []).map(
+    (row) => (row as { application_id: string }).application_id
+  );
+  if (applicationIds.length > 0) {
+    const { data: applications, error: applicationsError } = await supabase
+      .from("applications")
+      .select("candidate_id")
+      .in("id", applicationIds)
+      .not("candidate_id", "is", null);
 
-  if (applicationsError) {
-    console.error("[hr/candidates-data] Failed to resolve skill applications:", applicationsError.message);
-    return [];
+    if (applicationsError) {
+      console.error(
+        "[hr/candidates-data] Failed to resolve skill applications:",
+        applicationsError.message
+      );
+    } else {
+      for (const row of applications ?? []) {
+        const candidateId = (row as { candidate_id: string | null }).candidate_id;
+        if (candidateId) ids.add(candidateId);
+      }
+    }
   }
 
-  return [
-    ...new Set(
-      (applications ?? [])
-        .map((row) => (row as { candidate_id: string | null }).candidate_id)
-        .filter((id): id is string => Boolean(id))
-    ),
-  ];
+  return [...ids];
 }
 
 async function resolveCandidateSearchIds(
@@ -486,6 +522,7 @@ export async function getHRCandidateById(id: string): Promise<HRCandidateDetail 
   const applicationRows = (applicationsResult.data ?? []) as unknown as ApplicationDetailRow[];
 
   const applicationIds = applicationRows.map((row) => row.id);
+  const defaultApplicationId = applicationRows[0]?.id ?? null;
 
   let educationRows: EducationRow[] = [];
   let skillRows: SkillRow[] = [];
@@ -505,6 +542,44 @@ export async function getHRCandidateById(id: string): Promise<HRCandidateDetail 
     educationRows = (educationResult.data ?? []) as EducationRow[];
     skillRows = (skillsResult.data ?? []) as SkillRow[];
   }
+
+  const profileSkillNames = Array.isArray(detailsRow?.skills)
+    ? detailsRow.skills.map((s) => s.trim()).filter(Boolean)
+    : [];
+  const mergedSkills: HRCandidateSkill[] = [];
+  const seenSkills = new Set<string>();
+  for (const [index, skillName] of profileSkillNames.entries()) {
+    const key = skillName.toLowerCase();
+    if (seenSkills.has(key)) continue;
+    seenSkills.add(key);
+    mergedSkills.push({
+      id: `profile-skill-${index}`,
+      skillName,
+      proficiencyLevel: null,
+      yearsOfExperience: null,
+    });
+  }
+  for (const row of skillRows) {
+    const key = row.skill_name.trim().toLowerCase();
+    if (!key || seenSkills.has(key)) continue;
+    seenSkills.add(key);
+    mergedSkills.push({
+      id: row.id,
+      skillName: row.skill_name,
+      proficiencyLevel: row.proficiency_level,
+      yearsOfExperience: row.years_of_experience,
+    });
+  }
+
+  const storedAnalysis = resumeRow
+    ? await getLatestResumeAnalysisForCandidate(id, defaultApplicationId)
+    : null;
+
+  const resumeUploadedAt = resumeRow?.uploaded_at ?? null;
+  const analysisIsStale =
+    storedAnalysis &&
+    resumeUploadedAt &&
+    new Date(resumeUploadedAt).getTime() > new Date(storedAnalysis.updatedAt).getTime();
 
   return {
     id: profileRow.id,
@@ -528,11 +603,13 @@ export async function getHRCandidateById(id: string): Promise<HRCandidateDetail 
               ? detailsRow.highest_qualification
               : null,
           currentCompany: detailsRow.current_company,
+          currentSalary: detailsRow.current_salary ?? null,
           expectedSalary: detailsRow.expected_salary,
           noticePeriod:
             detailsRow.notice_period && isNoticePeriod(detailsRow.notice_period)
               ? detailsRow.notice_period
               : null,
+          skills: profileSkillNames,
           linkedinUrl: detailsRow.linkedin_url,
           portfolioUrl: detailsRow.portfolio_url,
           githubUrl: detailsRow.github_url,
@@ -546,6 +623,14 @@ export async function getHRCandidateById(id: string): Promise<HRCandidateDetail 
           uploadedAt: resumeRow.uploaded_at,
         }
       : null,
+    resumeAnalysis:
+      storedAnalysis && !analysisIsStale
+        ? {
+            analysis: storedAnalysis.analysis,
+            jobTitle: storedAnalysis.jobTitle,
+            updatedAt: storedAnalysis.updatedAt,
+          }
+        : null,
     hasProfilePicture,
     pictureUrl,
     education: educationRows.map((row) => ({
@@ -558,12 +643,7 @@ export async function getHRCandidateById(id: string): Promise<HRCandidateDetail 
       isCurrent: row.is_current,
       grade: row.grade,
     })),
-    skills: skillRows.map((row) => ({
-      id: row.id,
-      skillName: row.skill_name,
-      proficiencyLevel: row.proficiency_level,
-      yearsOfExperience: row.years_of_experience,
-    })),
+    skills: mergedSkills,
     applications: applicationRows.map((row) => ({
       id: row.id,
       jobTitle: row.jobs?.title ?? "Unknown role",

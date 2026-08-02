@@ -57,16 +57,16 @@ export function DashboardStatCards({
                     {stat.label}
                   </p>
                   {isResume ? (
-                    <p className="mt-3 text-3xl font-bold text-zinc-900 dark:text-zinc-50">
+                    <p className="mt-3 text-3xl font-bold text-white">
                       {hasResume ? (
-                        <span className="text-emerald-600 dark:text-emerald-400">Uploaded</span>
+                        <span className="text-emerald-300">Uploaded</span>
                       ) : (
-                        <span className="text-amber-600 dark:text-amber-400">Missing</span>
+                        <span className="text-amber-300">Missing</span>
                       )}
                     </p>
                   ) : isCompletion ? (
                     <>
-                      <p className="mt-3 text-4xl font-bold tracking-tight text-zinc-900 tabular-nums dark:text-zinc-50">
+                      <p className="mt-3 text-4xl font-bold tracking-tight text-white tabular-nums">
                         <AnimatedCounter value={completionPercentage} />%
                       </p>
                       <div className="mt-3">
@@ -74,7 +74,7 @@ export function DashboardStatCards({
                       </div>
                     </>
                   ) : (
-                    <p className="mt-3 text-4xl font-bold tracking-tight text-zinc-900 tabular-nums dark:text-zinc-50">
+                    <p className="mt-3 text-4xl font-bold tracking-tight text-white tabular-nums">
                       <AnimatedCounter value={values[stat.key] as number} />
                     </p>
                   )}

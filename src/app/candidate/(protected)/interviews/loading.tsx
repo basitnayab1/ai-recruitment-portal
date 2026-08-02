@@ -1,5 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
-import { DETAIL_SECTION, PAGE_STACK, SURFACE_CARD } from "@/lib/ui/classes";
+import { DETAIL_SECTION, PAGE_STACK } from "@/lib/ui/classes";
 
 export default function CandidateInterviewsLoading() {
   return (

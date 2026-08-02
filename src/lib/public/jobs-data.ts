@@ -7,6 +7,8 @@ import { isEmploymentType, type EmploymentType } from "@/lib/hr/jobs";
 export const PUBLIC_JOB_SORTS = ["newest", "closing_soon"] as const;
 export type PublicJobsSort = (typeof PUBLIC_JOB_SORTS)[number];
 
+export const PUBLIC_JOBS_PAGE_SIZE = 24;
+
 export function isPublicJobsSort(value: string): value is PublicJobsSort {
   return (PUBLIC_JOB_SORTS as readonly string[]).includes(value);
 }
@@ -17,6 +19,7 @@ export type PublicJobsFilters = {
   location?: string;
   employmentType?: EmploymentType;
   sort: PublicJobsSort;
+  page?: number;
 };
 
 export type PublicJobListItem = {
@@ -35,6 +38,8 @@ export type PublicJobDetail = PublicJobListItem & {
   description: string;
   responsibilities: string | null;
   requirements: string | null;
+  requiredSkills: string[];
+  preferredSkills: string[];
   salaryMin: number | null;
   salaryMax: number | null;
 };
@@ -47,6 +52,9 @@ export type PublicJobsFacets = {
 export type PublicJobsResult = {
   jobs: PublicJobListItem[];
   facets: PublicJobsFacets;
+  total: number;
+  page: number;
+  pageSize: number;
 };
 
 // Row shapes returned by Supabase. Manually typed since DB types have not
@@ -67,6 +75,8 @@ type PublicJobListRow = {
 type PublicJobDetailRow = PublicJobListRow & {
   responsibilities: string | null;
   requirements: string | null;
+  required_skills: string[] | null;
+  preferred_skills: string[] | null;
   salary_min: number | null;
   salary_max: number | null;
   status: string;
@@ -86,7 +96,12 @@ function toShortDescription(description: string, maxLength = 180): string {
 // them from user-supplied search text so a search term can never corrupt
 // the filter expression.
 function sanitizeSearchTerm(value: string): string {
-  return value.replace(/[,()]/g, " ").trim();
+  return value
+    .replace(/[,().*\\]/g, " ")
+    .replace(/[%_]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 100);
 }
 
 function toListItem(row: PublicJobListRow): PublicJobListItem {
@@ -119,10 +134,17 @@ export async function getPublicJobs(filters: PublicJobsFilters): Promise<PublicJ
   const supabase = await createClient();
   const nowIso = new Date().toISOString();
   const activeFilter = `closes_at.is.null,closes_at.gte.${nowIso}`;
+  const pageSize = PUBLIC_JOBS_PAGE_SIZE;
+  const page = Math.max(1, filters.page ?? 1);
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
 
   let query = supabase
     .from("jobs")
-    .select("id, title, department, location, is_remote, employment_type, description, published_at, closes_at")
+    .select(
+      "id, title, department, location, is_remote, employment_type, description, published_at, closes_at",
+      { count: "exact" }
+    )
     .eq("status", "published")
     .or(activeFilter);
 
@@ -146,13 +168,13 @@ export async function getPublicJobs(filters: PublicJobsFilters): Promise<PublicJ
       : query.order("published_at", { ascending: false, nullsFirst: false });
 
   const [jobsResult, facetsResult] = await Promise.all([
-    query,
+    query.range(from, to),
     supabase.from("jobs").select("department, location").eq("status", "published").or(activeFilter),
   ]);
 
   if (jobsResult.error) {
     console.error("[public/jobs-data] Failed to load jobs:", jobsResult.error.message);
-    return { jobs: [], facets: { departments: [], locations: [] } };
+    return { jobs: [], facets: { departments: [], locations: [] }, total: 0, page, pageSize };
   }
 
   const facetRows = (facetsResult.data ?? []) as { department: string | null; location: string | null }[];
@@ -166,6 +188,9 @@ export async function getPublicJobs(filters: PublicJobsFilters): Promise<PublicJ
   return {
     jobs: (jobsResult.data as PublicJobListRow[]).map(toListItem),
     facets: { departments, locations },
+    total: jobsResult.count ?? 0,
+    page,
+    pageSize,
   };
 }
 
@@ -183,7 +208,7 @@ export const getPublicJobById = cache(async (id: string): Promise<PublicJobDetai
   const { data, error } = await supabase
     .from("jobs")
     .select(
-      "id, title, department, location, is_remote, employment_type, description, responsibilities, requirements, salary_min, salary_max, published_at, closes_at, status"
+      "id, title, department, location, is_remote, employment_type, description, responsibilities, requirements, required_skills, preferred_skills, salary_min, salary_max, published_at, closes_at, status"
     )
     .eq("id", id)
     .eq("status", "published")
@@ -204,6 +229,8 @@ export const getPublicJobById = cache(async (id: string): Promise<PublicJobDetai
     description: row.description,
     responsibilities: row.responsibilities,
     requirements: row.requirements,
+    requiredSkills: Array.isArray(row.required_skills) ? row.required_skills : [],
+    preferredSkills: Array.isArray(row.preferred_skills) ? row.preferred_skills : [],
     salaryMin: row.salary_min,
     salaryMax: row.salary_max,
   };

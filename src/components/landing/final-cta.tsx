@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import type { LandingAuthState } from "@/lib/public/landing-auth";
+import { FadeReveal } from "@/components/react-bits/fade-reveal";
+import { RB_BTN_GHOST, RB_BTN_PRIMARY, RB_SECTION } from "@/lib/ui/premium";
 
 export function FinalCTA({ auth }: { auth: LandingAuthState }) {
   const signupHref =
@@ -16,47 +17,37 @@ export function FinalCTA({ auth }: { auth: LandingAuthState }) {
         : "Create Free Account";
 
   return (
-    <section className="py-24">
+    <section className={RB_SECTION}>
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.6 }}
-          className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-600 to-violet-700 px-8 py-16 text-center sm:px-16"
-        >
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -top-16 -right-16 h-64 w-64 rounded-full bg-white/10 blur-2xl"
-          />
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -bottom-16 -left-16 h-64 w-64 rounded-full bg-white/10 blur-2xl"
-          />
+        <FadeReveal>
+          <div className="relative overflow-hidden rounded-[2rem] border border-white/15 bg-gradient-to-br from-violet-600/40 via-fuchsia-600/25 to-indigo-700/40 p-10 text-center shadow-[0_30px_100px_rgba(91,33,182,0.35)] backdrop-blur-2xl sm:p-16">
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute -top-20 -right-16 h-64 w-64 rounded-full bg-fuchsia-400/30 blur-3xl"
+            />
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute -bottom-24 -left-10 h-72 w-72 rounded-full bg-violet-500/30 blur-3xl"
+            />
 
-          <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            Ready to find your next opportunity?
-          </h2>
-          <p className="mx-auto mt-4 max-w-xl text-lg text-indigo-100">
-            Create your free account today and start applying to real, live roles in minutes.
-          </p>
+            <h2 className="relative text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+              Ready to find your next opportunity?
+            </h2>
+            <p className="relative mx-auto mt-4 max-w-xl text-lg text-zinc-300">
+              Create your free account today and start applying to real, live roles in minutes.
+            </p>
 
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-            <Link
-              href={signupHref}
-              className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-indigo-700 shadow-lg transition-transform hover:scale-105"
-            >
-              {signupLabel}
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
-            <Link
-              href="/jobs"
-              className="inline-flex items-center gap-2 rounded-full border border-white/40 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10"
-            >
-              Browse Jobs
-            </Link>
+            <div className="relative mt-8 flex flex-wrap items-center justify-center gap-3">
+              <Link href={signupHref} className={RB_BTN_PRIMARY}>
+                {signupLabel}
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+              <Link href="/jobs" className={RB_BTN_GHOST}>
+                Browse Jobs
+              </Link>
+            </div>
           </div>
-        </motion.div>
+        </FadeReveal>
       </div>
     </section>
   );

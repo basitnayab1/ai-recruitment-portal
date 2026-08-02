@@ -18,7 +18,8 @@ type StoragePathRow = {
  * cannot sign (same pattern as HR resume downloads).
  */
 export async function createCandidateProfilePictureSignedUrl(
-  storagePath: string
+  storagePath: string,
+  candidateId?: string
 ): Promise<string | null> {
   const trimmedPath = storagePath.trim();
   if (!trimmedPath) {
@@ -26,6 +27,21 @@ export async function createCandidateProfilePictureSignedUrl(
   }
 
   const supabase = await createClient();
+  let ownerId = candidateId?.trim() || null;
+  if (!ownerId) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    ownerId = user?.id ?? null;
+  }
+  if (!ownerId || !trimmedPath.startsWith(`${ownerId}/`)) {
+    console.error("[profile-picture-urls] Refused signed URL — path ownership mismatch.", {
+      storagePath: trimmedPath,
+      ownerId,
+    });
+    return null;
+  }
+
   const { data, error } = await supabase.storage
     .from(PROFILE_PICTURE_BUCKET)
     .createSignedUrl(trimmedPath, PROFILE_PICTURE_SIGNED_URL_TTL_SECONDS);
@@ -34,6 +50,7 @@ export async function createCandidateProfilePictureSignedUrl(
     return data.signedUrl;
   }
 
+  // Admin fallback only after ownership check above.
   const supabaseAdmin = createAdminClient();
   const adminResult = await supabaseAdmin.storage
     .from(PROFILE_PICTURE_BUCKET)

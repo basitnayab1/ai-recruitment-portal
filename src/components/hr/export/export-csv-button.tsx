@@ -41,13 +41,13 @@ export function ExportCsvButton({ label, action }: ExportCsvButtonProps) {
         type="button"
         onClick={handleExport}
         disabled={isPending}
-        className="inline-flex h-10 items-center gap-2 rounded-lg bg-zinc-900 px-4 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+        className="inline-flex h-10 items-center gap-2 rounded-full bg-white px-4 text-sm font-semibold text-zinc-950 transition-colors hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-60"
       >
         <Download className="h-4 w-4" aria-hidden="true" />
         {isPending ? "Exporting…" : label}
       </button>
       {error ? (
-        <p className="text-sm text-red-600 dark:text-red-400" role="alert">
+        <p className="text-sm text-red-300" role="alert">
           {error}
         </p>
       ) : null}

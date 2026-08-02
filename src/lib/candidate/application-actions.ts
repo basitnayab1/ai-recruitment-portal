@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireCandidateUser } from "@/lib/candidate-auth/dal";
 import { sanitizeNextPath } from "@/lib/candidate-auth/next-path";
@@ -17,6 +17,7 @@ import {
   notifyHRNewApplication,
 } from "@/lib/notifications/events";
 import { auditCandidateApplied, candidateActor } from "@/lib/audit/events";
+import { evaluateApplicationResumeSafe } from "@/lib/ai/resume-evaluation-pipeline";
 
 export type ApplyToJobState = { status: "error"; message: string } | undefined;
 
@@ -163,9 +164,15 @@ export async function applyToJob(
     jobTitle: job.title,
   });
 
+  // AI resume evaluation + job ranking (cached; never blocks the candidate on failure)
+  await evaluateApplicationResumeSafe(inserted.id);
+
+  revalidatePath("/", "layout");
   revalidatePath("/candidate");
   revalidatePath("/candidate/applications");
   revalidatePath("/candidate/notifications");
   revalidatePath("/hr/notifications");
+  revalidatePath(`/hr/jobs/${jobId}`);
+  updateTag("landing-stats");
   redirect("/candidate/applications?applied=1");
 }

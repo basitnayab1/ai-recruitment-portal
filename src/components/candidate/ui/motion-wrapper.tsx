@@ -3,6 +3,8 @@
 import type { ReactNode } from "react";
 import { motion } from "framer-motion";
 
+const EASE = [0.22, 1, 0.36, 1] as const;
+
 export function MotionFadeIn({
   children,
   className,
@@ -14,9 +16,9 @@ export function MotionFadeIn({
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
+      initial={false}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45, delay, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.45, delay, ease: EASE }}
       className={className}
     >
       {children}
@@ -33,7 +35,7 @@ export function MotionStagger({
 }) {
   return (
     <motion.div
-      initial="hidden"
+      initial={false}
       animate="visible"
       variants={{
         hidden: {},
@@ -55,15 +57,9 @@ export function MotionStaggerItem({
 }) {
   return (
     <motion.div
-      variants={{
-        hidden: { opacity: 0, y: 20, scale: 0.98 },
-        visible: {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] },
-        },
-      }}
+      initial={false}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.4, ease: EASE }}
       whileHover={{ y: -4, transition: { duration: 0.2 } }}
       className={className}
     >
@@ -83,16 +79,16 @@ export function MotionProgressBar({
 }) {
   return (
     <div
-      className={`h-2.5 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800 ${className ?? ""}`}
+      className={`h-2.5 w-full overflow-hidden rounded-full bg-white/10 ${className ?? ""}`}
       role="progressbar"
       aria-valuenow={value}
       aria-valuemin={0}
       aria-valuemax={100}
     >
       <motion.div
-        initial={{ width: 0 }}
+        initial={false}
         animate={{ width: `${value}%` }}
-        transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
+        transition={{ duration: 1, ease: EASE, delay: 0.2 }}
         className={`h-full rounded-full bg-gradient-to-r from-violet-500 to-indigo-500 ${barClassName ?? ""}`}
       />
     </div>

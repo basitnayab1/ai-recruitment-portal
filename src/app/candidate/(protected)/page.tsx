@@ -12,6 +12,7 @@ import { UpcomingInterviewsSection } from "@/components/candidate/upcoming-inter
 import { LatestJobsCard } from "@/components/candidate/latest-jobs-card";
 import { ProfileUpdatedToast } from "@/components/candidate/profile-updated-toast";
 import { MotionFadeIn } from "@/components/candidate/ui/motion-wrapper";
+import { formatLongDisplayDate } from "@/lib/format/display-dates";
 import { PAGE_STACK } from "@/lib/ui/classes";
 
 export const metadata: Metadata = {
@@ -36,12 +37,13 @@ export default async function CandidateDashboardPage({
 
   const completion = getProfileCompletion(profile, details);
   const interviewsScheduled = upcomingInterviews.length;
+  const todayLabel = formatLongDisplayDate();
 
   return (
     <div className={PAGE_STACK}>
       {updated === "1" ? <ProfileUpdatedToast /> : null}
 
-      <DashboardHero fullName={profile.fullName} />
+      <DashboardHero fullName={profile.fullName} todayLabel={todayLabel} />
 
       <DashboardStatCards
         applicationsCount={stats.total}

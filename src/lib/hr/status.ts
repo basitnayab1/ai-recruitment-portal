@@ -45,52 +45,46 @@ export function isStatusChangeOption(value: string): value is ApplicationStatus 
   return STATUS_CHANGE_OPTIONS.some((option) => option.value === value);
 }
 
+/** Dark-glass badge surfaces — readable on purple void backgrounds. */
 export const APPLICATION_STATUS_META: Record<ApplicationStatus, StatusMeta> = {
   new: {
     label: "New",
-    badgeClassName:
-      "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300",
-    barClassName: "bg-zinc-400 dark:bg-zinc-500",
+    badgeClassName: "border border-white/15 bg-white/10 text-zinc-200",
+    barClassName: "bg-zinc-400",
   },
   ai_shortlisted: {
     label: "AI Shortlisted",
-    badgeClassName:
-      "bg-violet-50 text-violet-700 dark:bg-violet-950/40 dark:text-violet-300",
+    badgeClassName: "border border-violet-400/30 bg-violet-500/15 text-violet-200",
     barClassName: "bg-violet-500",
   },
   hr_review: {
     label: "HR Review",
-    badgeClassName:
-      "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300",
+    badgeClassName: "border border-amber-400/30 bg-amber-500/15 text-amber-200",
     barClassName: "bg-amber-500",
   },
   interview: {
     label: "Interview",
-    badgeClassName:
-      "bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300",
+    badgeClassName: "border border-blue-400/30 bg-blue-500/15 text-blue-200",
     barClassName: "bg-blue-500",
   },
   hold: {
     label: "Hold",
-    badgeClassName:
-      "bg-orange-50 text-orange-700 dark:bg-orange-950/40 dark:text-orange-300",
+    badgeClassName: "border border-orange-400/30 bg-orange-500/15 text-orange-200",
     barClassName: "bg-orange-500",
   },
   rejected: {
     label: "Rejected",
-    badgeClassName: "bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-300",
+    badgeClassName: "border border-red-400/30 bg-red-500/15 text-red-300",
     barClassName: "bg-red-500",
   },
   selected: {
     label: "Selected",
-    badgeClassName:
-      "bg-teal-50 text-teal-700 dark:bg-teal-950/40 dark:text-teal-300",
+    badgeClassName: "border border-teal-400/30 bg-teal-500/15 text-teal-200",
     barClassName: "bg-teal-500",
   },
   hired: {
     label: "Hired",
-    badgeClassName:
-      "bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-300",
-    barClassName: "bg-green-500",
+    badgeClassName: "border border-emerald-400/30 bg-emerald-500/15 text-emerald-300",
+    barClassName: "bg-emerald-500",
   },
 };

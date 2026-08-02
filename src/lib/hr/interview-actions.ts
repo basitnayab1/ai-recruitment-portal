@@ -25,7 +25,6 @@ import {
   notifyCandidateInterviewScheduled,
   notifyHRInterviewUpdated,
 } from "@/lib/notifications/events";
-import type { HRProfile } from "@/lib/auth/dal";
 import {
   auditInterviewCancelled,
   auditInterviewRescheduled,
@@ -432,16 +431,19 @@ export async function cancelInterviewAction(
   return { status: "success", message: "Interview cancelled and candidate notified." };
 }
 
-/** Used when status is changed to interview via the status form. */
+/**
+ * Used when status is changed to interview via the status form.
+ * Always re-authenticates via requireHRUser() — never trusts a client-supplied actor.
+ */
 export async function createInterviewForApplication({
   applicationId,
-  actor,
   parsed,
 }: {
   applicationId: string;
-  actor: HRProfile;
   parsed: ParsedInterviewForm;
 }): Promise<{ ok: true; interviewId: string } | { ok: false; message: string }> {
+  const actor = await requireHRUser();
+
   const context = await loadApplicationContext(applicationId);
   if ("error" in context) {
     return { ok: false, message: context.error };

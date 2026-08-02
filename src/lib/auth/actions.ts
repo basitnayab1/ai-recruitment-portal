@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { checkRateLimit, rateLimitKey } from "@/lib/security/rate-limit";
 
 export type LoginState = { error: string } | undefined;
 
@@ -19,6 +20,16 @@ export async function login(
 
   if (!email || !password) {
     return { error: "Please enter both your email and password." };
+  }
+
+  const limit = checkRateLimit({
+    key: rateLimitKey("hr-login", email),
+    limit: 10,
+    windowMs: 15 * 60 * 1000,
+    message: "Too many login attempts. Please wait and try again.",
+  });
+  if (!limit.ok) {
+    return { error: limit.message };
   }
 
   const supabase = await createClient();

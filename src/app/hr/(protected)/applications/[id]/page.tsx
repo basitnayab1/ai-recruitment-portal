@@ -11,8 +11,14 @@ import { CandidateAvatar } from "@/components/shared/candidate-avatar";
 import { StatusUpdateForm } from "@/components/hr/applications/status-update-form";
 import { AddNoteForm } from "@/components/hr/applications/add-note-form";
 import { InterviewManagement } from "@/components/hr/applications/interview-management";
+import { AIInterviewAssistantLazy } from "@/components/hr/ai-interview-assistant-lazy";
+import { AIEmailAssistantCard } from "@/components/hr/email/ai-email-assistant-card";
+import type { AIEmailContext } from "@/components/hr/email/ai-email-context";
 import { getInterviewByApplicationId } from "@/lib/hr/interview-data";
+import { resolveInterviewLocation } from "@/lib/hr/interviews";
+import { getInterviewQuestionsByApplicationId } from "@/lib/hr/interview-questions-data";
 import { BTN_PRIMARY, DETAIL_SECTION, PAGE_LINK_BACK, PAGE_TITLE } from "@/lib/ui/classes";
+import { formatIsoDateUTC } from "@/lib/format/display-dates";
 
 export const metadata: Metadata = {
   title: "Application Details | AI Recruitment Portal",
@@ -43,8 +49,8 @@ function formatNoticePeriod(value: string | null): string {
 function Field({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <dt className="text-xs font-medium text-zinc-500 dark:text-zinc-400">{label}</dt>
-      <dd className="mt-1 text-sm text-zinc-900 dark:text-zinc-50">{value}</dd>
+      <dt className="text-xs font-medium text-zinc-400">{label}</dt>
+      <dd className="mt-1 text-sm text-white">{value}</dd>
     </div>
   );
 }
@@ -64,6 +70,8 @@ export default async function HRApplicationDetailPage({
 
   const notes = await getApplicationNotes(id);
   const interview = await getInterviewByApplicationId(id);
+  const interviewQuestions = await getInterviewQuestionsByApplicationId(id);
+  const minInterviewDate = formatIsoDateUTC();
 
   const interviewForClient = interview
     ? {
@@ -80,6 +88,24 @@ export default async function HRApplicationDetailPage({
         notes: interview.notes,
       }
     : null;
+
+  const emailContext: AIEmailContext = {
+    applicationId: application.id,
+    candidateName: application.fullName,
+    candidateEmail: application.email,
+    jobTitle: application.job?.title ?? "the open role",
+    companyName: process.env.APP_NAME?.trim() || "AI Recruitment Portal",
+    interviewDate: interview?.interviewDate,
+    interviewTime: interview?.interviewTime,
+    interviewLocation: interview
+      ? resolveInterviewLocation(
+          interview.interviewType,
+          interview.meetingLink,
+          interview.officeLocation
+        )
+      : undefined,
+    hrNotes: interview?.notes ?? undefined,
+  };
 
   return (
     <div className="max-w-4xl space-y-6">
@@ -100,7 +126,7 @@ export default async function HRApplicationDetailPage({
             <StatusBadge status={application.status} />
           </div>
         </div>
-        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+        <p className="mt-1 text-sm text-zinc-400">
           Applied for {application.job?.title ?? "Unknown role"} · {formatDate(application.submittedAt)}
         </p>
       </div>
@@ -108,7 +134,7 @@ export default async function HRApplicationDetailPage({
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
           <div className={DETAIL_SECTION}>
-            <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">
+            <h2 className="text-base font-semibold text-white">
               Candidate Information
             </h2>
             <dl className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -143,20 +169,20 @@ export default async function HRApplicationDetailPage({
           </div>
 
           <div className={DETAIL_SECTION}>
-            <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">
+            <h2 className="text-base font-semibold text-white">
               Professional Profile
             </h2>
             <div className="mt-4 space-y-4">
               <div>
-                <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Skills</p>
+                <p className="text-xs font-medium text-zinc-400">Skills</p>
                 {application.skills.length === 0 ? (
-                  <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">No skills added yet.</p>
+                  <p className="mt-1 text-sm text-zinc-400">No skills added yet.</p>
                 ) : (
                   <ul className="mt-2 flex flex-wrap gap-2">
                     {application.skills.map((skill) => (
                       <li
                         key={skill.id}
-                        className="inline-flex items-center rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
+                        className="inline-flex items-center rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-200 dark:bg-zinc-800"
                       >
                         {skill.skillName}
                         {skill.proficiencyLevel ? ` · ${skill.proficiencyLevel}` : ""}
@@ -166,23 +192,23 @@ export default async function HRApplicationDetailPage({
                 )}
               </div>
               <div>
-                <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Education</p>
+                <p className="text-xs font-medium text-zinc-400">Education</p>
                 {application.education.length === 0 ? (
-                  <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+                  <p className="mt-1 text-sm text-zinc-400">
                     No education records added yet.
                   </p>
                 ) : (
                   <ul className="mt-2 space-y-3 divide-y divide-zinc-100 dark:divide-zinc-900">
                     {application.education.map((entry) => (
                       <li key={entry.id} className="pt-3 first:pt-0">
-                        <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
+                        <p className="text-sm font-medium text-white">
                           {entry.degree}
                           {entry.fieldOfStudy ? ` in ${entry.fieldOfStudy}` : ""}
                         </p>
-                        <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                        <p className="text-sm text-zinc-200">
                           {entry.institutionName}
                         </p>
-                        <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
+                        <p className="mt-0.5 text-xs text-zinc-400">
                           {entry.startDate ? formatDate(entry.startDate) : "—"} –{" "}
                           {entry.isCurrent ? "Present" : entry.endDate ? formatDate(entry.endDate) : "—"}
                           {entry.grade ? ` · ${entry.grade}` : ""}
@@ -196,18 +222,18 @@ export default async function HRApplicationDetailPage({
           </div>
 
           <div className={DETAIL_SECTION}>
-            <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">Cover Letter</h2>
+            <h2 className="text-base font-semibold text-white">Cover Letter</h2>
             {application.coverLetter ? (
-              <p className="mt-2 whitespace-pre-wrap text-sm text-zinc-600 dark:text-zinc-400">
+              <p className="mt-2 whitespace-pre-wrap text-sm text-zinc-200">
                 {application.coverLetter}
               </p>
             ) : (
-              <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">No cover letter provided.</p>
+              <p className="mt-2 text-sm text-zinc-400">No cover letter provided.</p>
             )}
           </div>
 
           <div className={DETAIL_SECTION}>
-            <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">Job Information</h2>
+            <h2 className="text-base font-semibold text-white">Job Information</h2>
             {application.job ? (
               <dl className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <Field label="Job Title" value={application.job.title} />
@@ -230,16 +256,21 @@ export default async function HRApplicationDetailPage({
                 />
               </dl>
             ) : (
-              <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+              <p className="mt-2 text-sm text-zinc-400">
                 This job posting is no longer available.
               </p>
             )}
           </div>
+
+          <AIInterviewAssistantLazy
+            applicationId={application.id}
+            initialQuestions={interviewQuestions?.questions ?? null}
+          />
         </div>
 
         <div className="space-y-6">
           <div className={DETAIL_SECTION}>
-            <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">Resume</h2>
+            <h2 className="text-base font-semibold text-white">Resume</h2>
             <a
               href={`/hr/applications/${application.id}/resume`}
               className={`${BTN_PRIMARY} w-full`}
@@ -249,7 +280,7 @@ export default async function HRApplicationDetailPage({
           </div>
 
           <div className={DETAIL_SECTION}>
-            <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">
+            <h2 className="text-base font-semibold text-white">
               Application Details
             </h2>
             <dl className="mt-4 space-y-4">
@@ -257,7 +288,7 @@ export default async function HRApplicationDetailPage({
               <Field label="Notice Period" value={formatNoticePeriod(application.noticePeriod)} />
               <Field label="Submitted" value={formatDate(application.submittedAt)} />
               <div>
-                <dt className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                <dt className="text-xs font-medium text-zinc-400">
                   Application Status
                 </dt>
                 <dd className="mt-1">
@@ -268,34 +299,48 @@ export default async function HRApplicationDetailPage({
           </div>
 
           <div className={DETAIL_SECTION}>
-            <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">
+            <h2 className="text-base font-semibold text-white">
               Interview Management
             </h2>
-            <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+            <p className="mt-1 text-xs text-zinc-400">
               Schedule, edit, reschedule, or cancel interviews for this candidate.
             </p>
             <div className="mt-4">
-              <InterviewManagement applicationId={application.id} interview={interviewForClient} />
+              <InterviewManagement
+                applicationId={application.id}
+                interview={interviewForClient}
+                emailContext={emailContext}
+                minInterviewDate={minInterviewDate}
+              />
             </div>
           </div>
 
           <div className={DETAIL_SECTION}>
-            <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">
+            <AIEmailAssistantCard context={emailContext} />
+          </div>
+
+          <div className={DETAIL_SECTION}>
+            <h2 className="text-base font-semibold text-white">
               Status Management
             </h2>
-            <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+            <p className="mt-1 text-xs text-zinc-400">
               Every change is recorded in this application&apos;s status history.
             </p>
             <div className="mt-4">
-              <StatusUpdateForm applicationId={application.id} currentStatus={application.status} />
+              <StatusUpdateForm
+                applicationId={application.id}
+                currentStatus={application.status}
+                emailContext={emailContext}
+                minInterviewDate={minInterviewDate}
+              />
             </div>
           </div>
         </div>
       </div>
 
       <div className={DETAIL_SECTION}>
-        <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">HR Notes</h2>
-        <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+        <h2 className="text-base font-semibold text-white">HR Notes</h2>
+        <p className="mt-1 text-xs text-zinc-400">
           Internal notes visible to HR/admin only — candidates never see these.
         </p>
 
@@ -307,15 +352,15 @@ export default async function HRApplicationDetailPage({
           <ul className="mt-6 space-y-4 divide-y divide-zinc-100 dark:divide-zinc-900">
             {notes.map((note) => (
               <li key={note.id} className="pt-4 first:pt-0">
-                <p className="whitespace-pre-wrap text-sm text-zinc-700 dark:text-zinc-300">{note.note}</p>
-                <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                <p className="whitespace-pre-wrap text-sm text-zinc-200">{note.note}</p>
+                <p className="mt-1 text-xs text-zinc-400">
                   {note.authorName ?? "HR"} · {formatDate(note.createdAt)}
                 </p>
               </li>
             ))}
           </ul>
         ) : (
-          <p className="mt-6 text-sm text-zinc-500 dark:text-zinc-400">No notes yet.</p>
+          <p className="mt-6 text-sm text-zinc-400">No notes yet.</p>
         )}
       </div>
     </div>

@@ -4,8 +4,12 @@ import { createClient } from "@/lib/supabase/server";
 import {
   isEmploymentType,
   isJobStatus,
+  isSeniorityLevel,
+  isWorkMode,
   type EmploymentType,
   type JobStatus,
+  type SeniorityLevel,
+  type WorkMode,
 } from "@/lib/hr/jobs";
 import { HR_LIST_PAGE_SIZE, sanitizeSearchTerm } from "@/lib/hr/search/constants";
 
@@ -41,8 +45,20 @@ type JobListRow = {
 
 type JobDetailRow = JobListRow & {
   description: string;
+  summary: string | null;
   requirements: string | null;
   responsibilities: string | null;
+  benefits: string | null;
+  required_skills: string[] | null;
+  preferred_skills: string[] | null;
+  matching_keywords: string[] | null;
+  experience_required: string | null;
+  education_required: string | null;
+  seniority_level: string | null;
+  work_mode: string | null;
+  open_positions: number | null;
+  hiring_manager: string | null;
+  internal_notes: string | null;
   salary_min: number | null;
   salary_max: number | null;
   published_at: string | null;
@@ -64,8 +80,20 @@ export type JobListItem = {
 
 export type JobDetail = JobListItem & {
   description: string;
+  summary: string | null;
   requirements: string | null;
   responsibilities: string | null;
+  benefits: string | null;
+  requiredSkills: string[];
+  preferredSkills: string[];
+  matchingKeywords: string[];
+  experienceRequired: string | null;
+  educationRequired: string | null;
+  seniorityLevel: SeniorityLevel | null;
+  workMode: WorkMode | null;
+  openPositions: number;
+  hiringManager: string | null;
+  internalNotes: string | null;
   salaryMin: number | null;
   salaryMax: number | null;
   publishedAt: string | null;
@@ -155,29 +183,36 @@ export async function getJobsPage(filters: HRJobsFilters): Promise<HRJobsPage> {
     jobsQuery = jobsQuery.eq("status", filters.status);
   }
 
-  const [jobsResult, applicationsResult] = await Promise.all([
-    jobsQuery.range(from, to),
-    supabase.from("applications").select("job_id"),
-  ]);
+  const jobsResult = await jobsQuery.range(from, to);
 
   if (jobsResult.error) {
     console.error("[jobs-data] Failed to load jobs:", jobsResult.error.message);
     return { jobs: [], total: 0, page, pageSize };
   }
 
+  const jobRows = (jobsResult.data ?? []) as JobListRow[];
+  const pageJobIds = jobRows.map((row) => row.id);
   const countsByJob = new Map<string, number>();
-  if (applicationsResult.error) {
-    console.error(
-      "[jobs-data] Failed to load application counts:",
-      applicationsResult.error.message
-    );
-  } else {
-    for (const row of (applicationsResult.data ?? []) as { job_id: string }[]) {
-      countsByJob.set(row.job_id, (countsByJob.get(row.job_id) ?? 0) + 1);
+
+  if (pageJobIds.length > 0) {
+    const applicationsResult = await supabase
+      .from("applications")
+      .select("job_id")
+      .in("job_id", pageJobIds);
+
+    if (applicationsResult.error) {
+      console.error(
+        "[jobs-data] Failed to load application counts:",
+        applicationsResult.error.message
+      );
+    } else {
+      for (const row of (applicationsResult.data ?? []) as { job_id: string }[]) {
+        countsByJob.set(row.job_id, (countsByJob.get(row.job_id) ?? 0) + 1);
+      }
     }
   }
 
-  const jobs = ((jobsResult.data ?? []) as JobListRow[]).map((row) => ({
+  const jobs = jobRows.map((row) => ({
     id: row.id,
     title: row.title,
     department: row.department,
@@ -215,19 +250,44 @@ export async function getJobById(id: string): Promise<JobDetail | null> {
 
   const row = jobResult.data as JobDetailRow;
 
+  const workMode =
+    row.work_mode && isWorkMode(row.work_mode)
+      ? row.work_mode
+      : row.is_remote
+        ? ("remote" as const)
+        : null;
+
   return {
     id: row.id,
     title: row.title,
     department: row.department,
     location: row.location,
-    isRemote: row.is_remote,
+    isRemote: row.is_remote || workMode === "remote",
     employmentType: toEmploymentType(row.employment_type),
     status: toJobStatus(row.status),
     applicationCount: applicationsResult.count ?? 0,
     createdAt: row.created_at,
     description: row.description,
+    summary: row.summary ?? null,
     requirements: row.requirements,
     responsibilities: row.responsibilities,
+    benefits: row.benefits ?? null,
+    requiredSkills: Array.isArray(row.required_skills) ? row.required_skills : [],
+    preferredSkills: Array.isArray(row.preferred_skills) ? row.preferred_skills : [],
+    matchingKeywords: Array.isArray(row.matching_keywords) ? row.matching_keywords : [],
+    experienceRequired: row.experience_required ?? null,
+    educationRequired: row.education_required ?? null,
+    seniorityLevel:
+      row.seniority_level && isSeniorityLevel(row.seniority_level)
+        ? row.seniority_level
+        : null,
+    workMode,
+    openPositions:
+      typeof row.open_positions === "number" && row.open_positions >= 1
+        ? row.open_positions
+        : 1,
+    hiringManager: row.hiring_manager ?? null,
+    internalNotes: row.internal_notes ?? null,
     salaryMin: row.salary_min,
     salaryMax: row.salary_max,
     publishedAt: row.published_at,

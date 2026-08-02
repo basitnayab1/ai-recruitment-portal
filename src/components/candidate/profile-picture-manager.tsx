@@ -52,8 +52,8 @@ export function ProfilePictureManager({
 
       <div className="min-w-0 flex-1 space-y-4">
         <div>
-          <h3 className="text-sm font-medium text-zinc-900 dark:text-zinc-50">Profile Picture</h3>
-          <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+          <h3 className="text-sm font-medium text-white">Profile Picture</h3>
+          <p className="mt-1 text-xs text-zinc-400">
             JPG, PNG, or WEBP up to 5 MB. Large images are resized automatically.
           </p>
         </div>

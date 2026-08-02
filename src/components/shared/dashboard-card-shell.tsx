@@ -16,7 +16,7 @@ export function DashboardCardShell({
   return (
     <div className={DASHBOARD_CARD}>
       <div className={CARD_HEADER}>
-        <h2 className="text-base font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{title}</h2>
+        <h2 className="text-base font-bold tracking-tight text-white">{title}</h2>
         {href ? (
           <Link href={href} className={CARD_HEADER_LINK}>
             {linkLabel} →

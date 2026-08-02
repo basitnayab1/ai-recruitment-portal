@@ -71,32 +71,32 @@ export function JobsTable({
               <td className={`${TABLE_CELL} whitespace-nowrap`}>
                 <Link
                   href={`/hr/jobs/${job.id}`}
-                  className="font-medium text-zinc-900 hover:underline dark:text-zinc-50"
+                  className="font-medium text-white hover:underline"
                 >
                   {job.title}
                 </Link>
                 {job.isRemote ? (
-                  <span className="ml-2 inline-flex items-center rounded-full bg-sky-50 px-2 py-0.5 text-xs font-medium text-sky-700 dark:bg-sky-950/40 dark:text-sky-300">
+                  <span className="ml-2 inline-flex items-center rounded-full border border-sky-400/30 bg-sky-500/15 px-2 py-0.5 text-xs font-medium text-sky-300">
                     Remote
                   </span>
                 ) : null}
               </td>
-              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-600 dark:text-zinc-400`}>
+              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-200`}>
                 {job.department ?? "—"}
               </td>
-              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-600 dark:text-zinc-400`}>
+              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-200`}>
                 {job.location ?? "—"}
               </td>
-              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-600 dark:text-zinc-400`}>
+              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-200`}>
                 {EMPLOYMENT_TYPE_LABELS[job.employmentType]}
               </td>
               <td className={TABLE_CELL}>
                 <JobStatusBadge status={job.status} />
               </td>
-              <td className={`${TABLE_CELL} text-zinc-600 dark:text-zinc-400`}>
+              <td className={`${TABLE_CELL} text-zinc-200`}>
                 {job.applicationCount}
               </td>
-              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-600 dark:text-zinc-400`}>
+              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-200`}>
                 {formatDate(job.createdAt)}
               </td>
               <td className={TABLE_CELL}>
