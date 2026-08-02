@@ -19,9 +19,7 @@ The product is designed around role isolation (HR vs candidate), Row Level Secur
 
 ## 2. Live Demo Link
 
-> Replace this URL with your deployed Vercel (or other) production URL after deploy.
-
-**Live demo:** [https://your-deployment.vercel.app](https://ai-recruitment-portal-one.vercel.app/)
+**Live demo:** [ai-recruitment-portal](https://ai-recruitment-portal-one.vercel.app/)
 
 Suggested smoke checks after deploy:
 
