@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireCandidateUser } from "@/lib/candidate-auth/dal";
 import { createClient } from "@/lib/supabase/server";
-import { getProfileCompletion } from "@/lib/candidate/dashboard-data";
+import { getProfileCompletion } from "@/lib/candidate/profile-completion";
 import {
   isGender,
   isHighestQualification,
@@ -29,41 +29,70 @@ export async function updateCandidateProfile(
   _prevState: UpdateProfileState,
   formData: FormData
 ): Promise<UpdateProfileState> {
-  const profile = await requireCandidateUser();
+  try {
+    console.log(`${LOG} updateCandidateProfile: request received`);
+    const profile = await requireCandidateUser();
 
-  const fullName = String(formData.get("fullName") ?? "").trim();
-  const phoneRaw = String(formData.get("phone") ?? "").trim();
-  const phone = phoneRaw.length > 0 ? phoneRaw : null;
+    const fullName = String(formData.get("fullName") ?? "").trim();
+    const phoneRaw = String(formData.get("phone") ?? "").trim();
+    const phone = phoneRaw.length > 0 ? phoneRaw : null;
 
-  if (!fullName) {
-    return { status: "error", message: "Full name is required." };
+    if (!fullName) {
+      return { status: "error", message: "Full name is required." };
+    }
+    if (fullName.length > 200) {
+      return { status: "error", message: "Full name must be under 200 characters." };
+    }
+    if (phone && !PHONE_PATTERN.test(phone)) {
+      return { status: "error", message: "Please enter a valid phone number." };
+    }
+
+    const supabase = await createClient();
+
+    console.log(`${LOG} updateCandidateProfile: updating candidate_profiles`, {
+      candidateId: profile.id,
+      hasPhone: Boolean(phone),
+    });
+
+    const { error } = await supabase
+      .from("candidate_profiles")
+      .update({ full_name: fullName, phone })
+      .eq("id", profile.id);
+
+    if (error) {
+      console.error(`${LOG} updateCandidateProfile supabase error:`, {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint,
+      });
+      return {
+        status: "error",
+        message: error.message || "Something went wrong saving your profile. Please try again.",
+      };
+    }
+
+    revalidatePath("/candidate/profile");
+    revalidatePath("/candidate");
+
+    console.log(`${LOG} updateCandidateProfile: success`, { candidateId: profile.id });
+    return { status: "success", message: "Profile updated successfully." };
+  } catch (error) {
+    // Preserve Next.js redirect() from requireCandidateUser (auth gate).
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "digest" in error &&
+      typeof (error as { digest?: unknown }).digest === "string" &&
+      (error as { digest: string }).digest.startsWith("NEXT_REDIRECT")
+    ) {
+      throw error;
+    }
+    console.error(`${LOG} updateCandidateProfile unexpected error:`, error);
+    const message =
+      error instanceof Error ? error.message : "Unexpected error while saving profile.";
+    return { status: "error", message };
   }
-  if (fullName.length > 200) {
-    return { status: "error", message: "Full name must be under 200 characters." };
-  }
-  if (phone && !PHONE_PATTERN.test(phone)) {
-    return { status: "error", message: "Please enter a valid phone number." };
-  }
-
-  const supabase = await createClient();
-
-  const { error } = await supabase
-    .from("candidate_profiles")
-    .update({ full_name: fullName, phone })
-    .eq("id", profile.id);
-
-  if (error) {
-    console.error(`${LOG} updateCandidateProfile failed:`, error.message);
-    return {
-      status: "error",
-      message: error.message || "Something went wrong saving your profile. Please try again.",
-    };
-  }
-
-  revalidatePath("/candidate/profile");
-  revalidatePath("/candidate");
-
-  return { status: "success", message: "Profile updated successfully." };
 }
 
 export type UpdateProfileDetailsState =
@@ -97,6 +126,16 @@ function mapProfileDetailsSaveError(message: string): string {
     );
   }
   return message || "Something went wrong saving your profile. Please try again.";
+}
+
+function isNextRedirectError(error: unknown): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "digest" in error &&
+    typeof (error as { digest?: unknown }).digest === "string" &&
+    (error as { digest: string }).digest.startsWith("NEXT_REDIRECT")
+  );
 }
 
 /**
@@ -250,7 +289,12 @@ export async function updateCandidateProfileDetails(
       .single();
 
     if (error) {
-      console.error(`${LOG} upsert failed:`, error.message, error.code, error.details);
+      console.error(`${LOG} upsert failed:`, {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint,
+      });
       return {
         status: "error",
         message: mapProfileDetailsSaveError(error.message),
@@ -271,8 +315,12 @@ export async function updateCandidateProfileDetails(
       message: "Profile saved successfully. Your skills are now available to recruiters and AI matching.",
     };
   } catch (error) {
-    console.error(`${LOG} unexpected error:`, error);
-    const message = error instanceof Error ? error.message : "Unexpected error while saving profile.";
+    if (isNextRedirectError(error)) {
+      throw error;
+    }
+    console.error(`${LOG} updateCandidateProfileDetails unexpected error:`, error);
+    const message =
+      error instanceof Error ? error.message : "Unexpected error while saving profile.";
     return { status: "error", message };
   }
 }

@@ -4,7 +4,11 @@ import { createClient } from "@/lib/supabase/server";
 import { isApplicationStatus, type ApplicationStatus } from "@/lib/hr/status";
 import { isEmploymentType, type EmploymentType } from "@/lib/hr/jobs";
 import type { CandidateProfile } from "@/lib/candidate-auth/dal";
-import type { CandidateProfileDetails } from "@/lib/candidate/profile-details";
+export {
+  getProfileCompletion,
+  type ProfileCompletion,
+  type ProfileCompletionField,
+} from "@/lib/candidate/profile-completion";
 
 type CandidateApplicationRow = {
   id: string;
@@ -147,72 +151,3 @@ export async function getCandidateDashboardData(
 }
 
 export const MIN_PROFILE_COMPLETION_TO_APPLY = 70;
-
-export type ProfileCompletionField = {
-  label: string;
-  completed: boolean;
-};
-
-export type ProfileCompletion = {
-  percentage: number;
-  completedFields: number;
-  totalFields: number;
-  fields: ProfileCompletionField[];
-};
-
-function hasValue(value: string | number | null | undefined): boolean {
-  if (typeof value === "number") return true;
-  return Boolean(value && value.trim().length > 0);
-}
-
-/**
- * Calculates profile completion across both `candidate_profiles` (core
- * identity: name/email, plus phone as a fallback — see below) and
- * `candidate_profile_details` (the extended "complete your profile" fields
- * from supabase/migrations/003_candidate_profile_details.sql).
- *
- * `details` may be `null` (candidate hasn't saved their details yet) or a
- * partial object of *pending* values not yet persisted — this same
- * function is used both to display live completion and, in
- * `src/lib/candidate/profile-actions.ts`, to compute the
- * `profile_completion` value to persist on save.
- *
- * Phone exists on both tables (see profile-actions.ts / the profile page
- * for why); it is only counted once here, preferring the newer
- * `candidate_profile_details.phone` and falling back to the core profile's.
- */
-export function getProfileCompletion(
-  profile: CandidateProfile,
-  details: Partial<CandidateProfileDetails> | null
-): ProfileCompletion {
-  const fields: ProfileCompletionField[] = [
-    { label: "Full Name", completed: hasValue(profile.fullName) },
-    { label: "Email", completed: hasValue(profile.email) },
-    { label: "Phone", completed: hasValue(details?.phone ?? profile.phone) },
-    { label: "CNIC", completed: hasValue(details?.cnic) },
-    { label: "Date of Birth", completed: hasValue(details?.dateOfBirth) },
-    { label: "Gender", completed: hasValue(details?.gender) },
-    { label: "Country", completed: hasValue(details?.country) },
-    { label: "Province", completed: hasValue(details?.province) },
-    { label: "City", completed: hasValue(details?.city) },
-    { label: "Address", completed: hasValue(details?.address) },
-    { label: "Current Job Title", completed: hasValue(details?.currentJobTitle) },
-    { label: "Years of Experience", completed: hasValue(details?.yearsOfExperience) },
-    { label: "Highest Qualification", completed: hasValue(details?.highestQualification) },
-    { label: "Current Company", completed: hasValue(details?.currentCompany) },
-    { label: "Expected Salary", completed: hasValue(details?.expectedSalary) },
-    { label: "Notice Period", completed: hasValue(details?.noticePeriod) },
-    { label: "LinkedIn URL", completed: hasValue(details?.linkedinUrl) },
-    { label: "Portfolio URL", completed: hasValue(details?.portfolioUrl) },
-    { label: "GitHub URL", completed: hasValue(details?.githubUrl) },
-  ];
-  const completedFields = fields.filter((field) => field.completed).length;
-  const totalFields = fields.length;
-
-  return {
-    percentage: Math.round((completedFields / totalFields) * 100),
-    completedFields,
-    totalFields,
-    fields,
-  };
-}

@@ -83,6 +83,11 @@ export function CandidateAvatar({
         height={dimension}
         className="h-full w-full object-cover"
         loading="lazy"
+        // Signed Supabase URLs are already sized for avatars. Skipping the
+        // Next image optimizer avoids loading native `sharp` on every profile
+        // render — a broken sharp binary was crashing the dev server and
+        // causing Server Action "Failed to fetch" on this page.
+        unoptimized
         onError={() => setLoadFailed(true)}
       />
     </span>
