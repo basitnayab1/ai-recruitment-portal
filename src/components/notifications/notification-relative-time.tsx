@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { formatRelativeTime } from "@/lib/hr/format";
 
 /** UTC-stable absolute label — identical output on server and client. */
@@ -20,10 +20,14 @@ function formatNotificationTimestampUtc(value: string): string {
   }).format(date);
 }
 
+function subscribe(onStoreChange: () => void): () => void {
+  const id = window.setInterval(onStoreChange, 60_000);
+  return () => window.clearInterval(id);
+}
+
 /**
  * Renders a notification timestamp without hydration mismatches.
- * SSR and the first client paint use a fixed UTC absolute time; relative
- * copy ("5 minutes ago") is applied only after mount via useEffect.
+ * SSR uses a fixed UTC absolute time; relative copy updates on the client.
  */
 export function NotificationRelativeTime({
   createdAt,
@@ -32,12 +36,11 @@ export function NotificationRelativeTime({
   createdAt: string;
   className?: string;
 }) {
-  const stableLabel = formatNotificationTimestampUtc(createdAt);
-  const [label, setLabel] = useState(stableLabel);
-
-  useEffect(() => {
-    setLabel(formatRelativeTime(createdAt));
-  }, [createdAt]);
+  const label = useSyncExternalStore(
+    subscribe,
+    () => formatRelativeTime(createdAt),
+    () => formatNotificationTimestampUtc(createdAt)
+  );
 
   return <span className={className}>{label}</span>;
 }

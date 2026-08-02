@@ -27,13 +27,13 @@ function ChartCard({
   return (
     <div className={CHART_CARD}>
       <div>
-        <h2 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{title}</h2>
+        <h2 className="text-lg font-bold tracking-tight text-white">{title}</h2>
         {description ? (
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{description}</p>
+          <p className="mt-1 text-sm text-zinc-400">{description}</p>
         ) : null}
       </div>
       {isEmpty ? (
-        <p className="mt-8 text-sm text-zinc-500 dark:text-zinc-400">{emptyMessage}</p>
+        <p className="mt-8 text-sm text-zinc-400">{emptyMessage}</p>
       ) : (
         <div className="mt-8">{children}</div>
       )}
@@ -58,7 +58,7 @@ export function ApplicationsPerMonthChart({ data }: { data: MonthlyApplicationCo
 
           return (
             <div key={entry.monthKey} className="group flex min-w-0 flex-1 flex-col items-center gap-3">
-              <span className="text-sm font-bold text-zinc-700 tabular-nums dark:text-zinc-300">
+              <span className="text-sm font-bold text-zinc-200 tabular-nums">
                 {entry.count}
               </span>
               <div className="flex h-44 w-full items-end">
@@ -68,7 +68,7 @@ export function ApplicationsPerMonthChart({ data }: { data: MonthlyApplicationCo
                   title={`${entry.month}: ${entry.count}`}
                 />
               </div>
-              <span className="truncate text-center text-xs font-medium text-zinc-500 dark:text-zinc-400">
+              <span className="truncate text-center text-xs font-medium text-zinc-400">
                 {entry.month}
               </span>
             </div>
@@ -104,13 +104,13 @@ export function ApplicationsByStatusChart({
           return (
             <li key={status}>
               <div className="flex items-center justify-between text-sm">
-                <span className="font-medium text-zinc-600 dark:text-zinc-400">{meta.label}</span>
-                <span className="font-bold text-zinc-900 dark:text-zinc-50">
+                <span className="font-medium text-zinc-200">{meta.label}</span>
+                <span className="font-bold text-white">
                   {count}{" "}
                   <span className="text-xs font-normal text-zinc-400">({percent}%)</span>
                 </span>
               </div>
-              <div className="mt-2 h-2.5 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
+              <div className="mt-2 h-2.5 w-full overflow-hidden rounded-full bg-white/10">
                 <div
                   className={`h-full rounded-full transition-all duration-500 ${meta.barClassName}`}
                   style={{ width: `${percent}%` }}
@@ -142,14 +142,14 @@ export function JobsByDepartmentChart({ data }: { data: DepartmentJobCount[] }) 
           return (
             <li key={entry.department}>
               <div className="flex items-center justify-between gap-3 text-sm">
-                <span className="truncate font-medium text-zinc-600 dark:text-zinc-400">
+                <span className="truncate font-medium text-zinc-200">
                   {entry.department}
                 </span>
-                <span className="shrink-0 font-bold text-zinc-900 dark:text-zinc-50">
+                <span className="shrink-0 font-bold text-white">
                   {entry.count}
                 </span>
               </div>
-              <div className="mt-2 h-2.5 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
+              <div className="mt-2 h-2.5 w-full overflow-hidden rounded-full bg-white/10">
                 <div
                   className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 transition-all duration-500"
                   style={{ width: `${percent}%` }}

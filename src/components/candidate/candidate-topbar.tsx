@@ -35,24 +35,19 @@ function getBreadcrumbs(pathname: string): { label: string; href?: string }[] {
   return crumbs;
 }
 
-function getGreeting(): string {
-  const hour = new Date().getHours();
-  if (hour < 12) return "Good morning";
-  if (hour < 17) return "Good afternoon";
-  return "Good evening";
-}
-
 export function CandidateTopbar({
   fullName,
   email,
   completionPercentage,
   pictureUrl,
+  greeting,
   notificationProps,
 }: {
   fullName: string;
   email: string;
   completionPercentage: number;
   pictureUrl: string | null;
+  greeting: string;
   notificationProps: {
     role: "candidate";
     notificationsPath: string;
@@ -73,7 +68,7 @@ export function CandidateTopbar({
   }
 
   return (
-    <header className="sticky top-0 z-20 flex min-h-[72px] shrink-0 flex-col justify-center gap-3 border-b border-zinc-200/60 bg-white/70 px-4 py-3 backdrop-blur-xl sm:flex-row sm:items-center sm:px-6 dark:border-zinc-800/60 dark:bg-zinc-950/70">
+    <header className="sticky top-0 z-20 flex min-h-[72px] shrink-0 flex-col justify-center gap-3 border-b border-white/10 bg-[#0a0a12]/70 px-4 py-3 backdrop-blur-2xl sm:flex-row sm:items-center sm:px-6">
       <div className="flex items-center gap-3 lg:hidden">
         <CandidateMobileNav
           fullName={fullName}
@@ -84,22 +79,22 @@ export function CandidateTopbar({
       </div>
 
       <div className="hidden min-w-0 flex-1 lg:block">
-        <p className="text-xs font-semibold text-violet-600 dark:text-violet-400">
-          {getGreeting()}, {firstName} 👋
+        <p className="text-xs font-semibold text-violet-300">
+          {greeting}, {firstName}
         </p>
         <nav aria-label="Breadcrumb" className="mt-0.5 flex items-center gap-1.5 text-sm">
           {breadcrumbs.map((crumb, index) => (
             <span key={`${crumb.label}-${index}`} className="flex items-center gap-1.5">
-              {index > 0 ? <span className="text-zinc-300 dark:text-zinc-700">/</span> : null}
+              {index > 0 ? <span className="text-zinc-200">/</span> : null}
               {crumb.href && index < breadcrumbs.length - 1 ? (
                 <Link
                   href={crumb.href}
-                  className="font-medium text-zinc-500 transition-colors hover:text-violet-600 dark:text-zinc-400 dark:hover:text-violet-400"
+                  className="font-medium text-zinc-400 transition-colors hover:text-violet-300"
                 >
                   {crumb.label}
                 </Link>
               ) : (
-                <span className="font-semibold text-zinc-900 dark:text-zinc-50">{crumb.label}</span>
+                <span className="font-semibold text-white">{crumb.label}</span>
               )}
             </span>
           ))}
@@ -108,7 +103,7 @@ export function CandidateTopbar({
 
       <form onSubmit={handleSearch} className="relative hidden max-w-sm flex-1 md:block lg:max-w-md">
         <Search
-          className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-zinc-400"
+          className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-zinc-500"
           aria-hidden="true"
         />
         <input
@@ -117,7 +112,7 @@ export function CandidateTopbar({
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search jobs…"
           aria-label="Search jobs"
-          className="h-10 w-full rounded-xl border border-zinc-200/80 bg-white/90 pr-4 pl-10 text-sm text-zinc-900 shadow-sm outline-none transition-all placeholder:text-zinc-400 focus-visible:border-violet-400 focus-visible:ring-4 focus-visible:ring-violet-500/10 dark:border-zinc-700/80 dark:bg-zinc-900/90 dark:text-zinc-100"
+          className="h-10 w-full rounded-xl border border-white/10 bg-white/[0.04] pr-4 pl-10 text-sm text-white outline-none transition-all placeholder:text-zinc-500 focus-visible:border-violet-400/60 focus-visible:ring-4 focus-visible:ring-violet-500/20"
         />
       </form>
 

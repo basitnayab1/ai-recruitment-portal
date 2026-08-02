@@ -14,7 +14,7 @@ export function ApplicationsCard({
   return (
     <div className={CHART_CARD}>
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">My Applications</h2>
+        <h2 className="text-sm font-semibold text-white">My Applications</h2>
         {applications.length > 0 ? (
           <Link href="/candidate/applications" className={`${CARD_HEADER_LINK} text-sm`}>
             View All
@@ -43,10 +43,10 @@ export function ApplicationsCard({
               className="flex items-center justify-between gap-4 py-3 first:pt-0 last:pb-0"
             >
               <div className="min-w-0">
-                <p className="truncate text-sm font-medium text-zinc-900 dark:text-zinc-50">
+                <p className="truncate text-sm font-medium text-white">
                   {application.jobTitle}
                 </p>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                <p className="text-xs text-zinc-400">
                   Applied {formatDate(application.submittedAt)}
                 </p>
               </div>

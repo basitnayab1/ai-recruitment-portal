@@ -26,13 +26,13 @@ export function JobRowActions({ jobId, status }: { jobId: string; status: JobSta
       <div className="flex items-center justify-end gap-3 whitespace-nowrap text-sm">
         <Link
           href={`/hr/jobs/${jobId}`}
-          className="font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
+          className="font-medium text-zinc-200 hover:text-white"
         >
           View
         </Link>
         <Link
           href={`/hr/jobs/${jobId}/edit`}
-          className="font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
+          className="font-medium text-zinc-200 hover:text-white"
         >
           Edit
         </Link>
@@ -54,7 +54,7 @@ export function JobRowActions({ jobId, status }: { jobId: string; status: JobSta
             <button
               type="submit"
               disabled={closePending}
-              className="font-medium text-red-700 hover:text-red-800 disabled:cursor-not-allowed disabled:opacity-60 dark:text-red-400 dark:hover:text-red-300"
+              className="font-medium text-red-700 hover:text-red-800 disabled:cursor-not-allowed disabled:opacity-60 dark:hover:text-red-300"
             >
               {closePending ? "Closing…" : "Close"}
             </button>
@@ -62,10 +62,10 @@ export function JobRowActions({ jobId, status }: { jobId: string; status: JobSta
         ) : null}
       </div>
       {publishState?.error ? (
-        <p className="text-xs text-red-600 dark:text-red-400">{publishState.error}</p>
+        <p className="text-xs text-red-300">{publishState.error}</p>
       ) : null}
       {closeState?.error ? (
-        <p className="text-xs text-red-600 dark:text-red-400">{closeState.error}</p>
+        <p className="text-xs text-red-300">{closeState.error}</p>
       ) : null}
     </div>
   );

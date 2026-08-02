@@ -7,6 +7,7 @@ import {
   getNotificationPreview,
   getUnreadNotificationCount,
 } from "@/lib/notifications/data";
+import { formatGreeting } from "@/lib/format/display-dates";
 import { CandidateShell } from "@/components/candidate/candidate-shell";
 
 export default async function CandidateProtectedLayout({
@@ -25,8 +26,9 @@ export default async function CandidateProtectedLayout({
 
   const completion = getProfileCompletion(profile, details);
   const pictureUrl = picture
-    ? await createCandidateProfilePictureSignedUrl(picture.storagePath)
+    ? await createCandidateProfilePictureSignedUrl(picture.storagePath, profile.id)
     : null;
+  const greeting = formatGreeting();
 
   return (
     <CandidateShell
@@ -34,6 +36,7 @@ export default async function CandidateProtectedLayout({
       email={profile.email}
       completionPercentage={completion.percentage}
       pictureUrl={pictureUrl}
+      greeting={greeting}
       notifications={{
         preview: preview.map((n) => ({
           id: n.id,

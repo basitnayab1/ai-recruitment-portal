@@ -27,23 +27,17 @@ export type {
  * All reads use the caller's authenticated Supabase session (RLS-scoped).
  */
 export async function getAnalyticsDashboardData(): Promise<AnalyticsDashboardData> {
-  const [
-    counts,
-    jobTitles,
-    recentActivity,
-    upcomingInterviews,
-    reviewTimeDeltasDays,
-    recentLists,
-  ] = await Promise.all([
-    fetchAnalyticsCounts(),
-    fetchJobTitlesById(),
-    fetchRecentActivity(),
-    fetchUpcomingInterviews(),
-    fetchReviewTimeDeltasDays(),
-    fetchRecentLists(),
-  ]);
+  const [counts, recentActivity, upcomingInterviews, reviewTimeDeltasDays, recentLists] =
+    await Promise.all([
+      fetchAnalyticsCounts(),
+      fetchRecentActivity(),
+      fetchUpcomingInterviews(),
+      fetchReviewTimeDeltasDays(),
+      fetchRecentLists(),
+    ]);
 
   const { stats, statusDistribution, submittedAts, jobApplicationCounts } = counts;
+  const jobTitles = await fetchJobTitlesById([...jobApplicationCounts.keys()]);
 
   return {
     stats,

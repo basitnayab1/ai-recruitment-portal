@@ -90,19 +90,19 @@ export default async function CandidateApplicationsPage({
             <tbody className={TABLE_BODY}>
               {applications.map((application) => (
                 <tr key={application.id} className={TABLE_ROW}>
-                  <td className={`${TABLE_CELL} font-semibold text-zinc-900 dark:text-zinc-50`}>
+                  <td className={`${TABLE_CELL} font-semibold text-white`}>
                     {application.jobTitle}
                     {application.department ? (
                       <p className="mt-0.5 text-xs font-normal text-zinc-500">{application.department}</p>
                     ) : null}
                   </td>
-                  <td className={`${TABLE_CELL} text-zinc-600 dark:text-zinc-400`}>
+                  <td className={`${TABLE_CELL} text-zinc-200`}>
                     {application.isRemote ? "Remote" : (application.location ?? "—")}
                   </td>
-                  <td className={`${TABLE_CELL} text-zinc-600 dark:text-zinc-400`}>
+                  <td className={`${TABLE_CELL} text-zinc-200`}>
                     {EMPLOYMENT_TYPE_LABELS[application.employmentType]}
                   </td>
-                  <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-600 dark:text-zinc-400`}>
+                  <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-200`}>
                     {formatDate(application.submittedAt)}
                   </td>
                   <td className={TABLE_CELL}>

@@ -22,10 +22,10 @@ export function EmptyState({ icon: Icon, title, description }: EmptyStateProps) 
           <Icon className="h-7 w-7 text-white" aria-hidden="true" />
         </div>
       </div>
-      <h2 className="relative mt-6 text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+      <h2 className="relative mt-6 text-xl font-bold tracking-tight text-white">
         {title}
       </h2>
-      <p className="relative mt-2 max-w-md text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
+      <p className="relative mt-2 max-w-md text-sm leading-relaxed text-zinc-400">
         {description}
       </p>
     </div>

@@ -40,7 +40,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <nav className="flex flex-1 flex-col gap-1 px-3 py-2" aria-label="HR navigation">
-      <p className="mb-2 px-3 text-[10px] font-bold tracking-widest text-zinc-600 uppercase">
+      <p className="mb-2 px-3 text-[10px] font-bold tracking-widest text-zinc-200 uppercase">
         Menu
       </p>
       {HR_NAV_ITEMS.map((item) => {

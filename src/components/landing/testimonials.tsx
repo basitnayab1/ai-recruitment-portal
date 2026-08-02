@@ -3,11 +3,8 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
-import { SURFACE_CARD } from "@/lib/ui/classes";
+import { RB_GLASS_STRONG, RB_SECTION } from "@/lib/ui/premium";
 
-// Illustrative testimonials — no real candidate data or photos are used
-// here (this is marketing copy, distinct from the recruitment data shown
-// elsewhere on the site, which is always sourced live from Supabase).
 const TESTIMONIALS = [
   {
     quote:
@@ -41,33 +38,34 @@ export function Testimonials() {
   }
 
   return (
-    <section className="py-24">
+    <section className={RB_SECTION}>
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <div className="text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl dark:text-zinc-50">
+          <p className="text-[11px] font-semibold tracking-[0.22em] text-violet-300/90 uppercase">
+            Testimonials
+          </p>
+          <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
             What Candidates Say
           </h2>
         </div>
 
-        <div className="relative mt-12 min-h-[220px]">
+        <div className="relative mt-12 min-h-[240px]">
           <AnimatePresence mode="wait">
             <motion.figure
               key={index}
-              initial={{ opacity: 0, x: 24 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -24 }}
-              transition={{ duration: 0.35, ease: "easeInOut" }}
-              className={`p-8 text-center sm:p-10 ${SURFACE_CARD}`}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.35 }}
+              className={`${RB_GLASS_STRONG} p-8 text-center sm:p-10`}
             >
-              <Quote className="mx-auto h-8 w-8 text-indigo-500" aria-hidden="true" />
-              <blockquote className="mt-4 text-lg leading-relaxed text-zinc-700 dark:text-zinc-300">
+              <Quote className="mx-auto h-8 w-8 text-violet-300" aria-hidden="true" />
+              <blockquote className="mt-4 text-lg leading-relaxed text-zinc-200">
                 &ldquo;{current.quote}&rdquo;
               </blockquote>
               <figcaption className="mt-6">
-                <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
-                  {current.name}
-                </p>
-                <p className="text-sm text-zinc-500 dark:text-zinc-400">{current.role}</p>
+                <p className="text-sm font-semibold text-white">{current.name}</p>
+                <p className="text-sm text-zinc-400">{current.role}</p>
               </figcaption>
             </motion.figure>
           </AnimatePresence>
@@ -78,35 +76,17 @@ export function Testimonials() {
             type="button"
             onClick={prev}
             aria-label="Previous testimonial"
-            className="rounded-full border border-zinc-300 p-2 text-zinc-600 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/5 text-zinc-200 transition hover:bg-white/10"
           >
-            <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+            <ChevronLeft className="h-5 w-5" />
           </button>
-
-          <div className="flex items-center gap-2">
-            {TESTIMONIALS.map((testimonial, dotIndex) => (
-              <button
-                key={testimonial.name}
-                type="button"
-                onClick={() => setIndex(dotIndex)}
-                aria-label={`Show testimonial ${dotIndex + 1}`}
-                aria-current={dotIndex === index}
-                className={`h-2 w-2 rounded-full transition-colors ${
-                  dotIndex === index
-                    ? "bg-indigo-600 dark:bg-indigo-400"
-                    : "bg-zinc-300 dark:bg-zinc-700"
-                }`}
-              />
-            ))}
-          </div>
-
           <button
             type="button"
             onClick={next}
             aria-label="Next testimonial"
-            className="rounded-full border border-zinc-300 p-2 text-zinc-600 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/5 text-zinc-200 transition hover:bg-white/10"
           >
-            <ChevronRight className="h-4 w-4" aria-hidden="true" />
+            <ChevronRight className="h-5 w-5" />
           </button>
         </div>
       </div>

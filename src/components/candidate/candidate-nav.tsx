@@ -18,7 +18,7 @@ export function CandidateNav() {
   return (
     <nav
       aria-label="Candidate navigation"
-      className="flex gap-1 overflow-x-auto border-b border-zinc-200 pb-3 dark:border-zinc-800"
+      className="flex gap-1 overflow-x-auto border-b border-white/10 pb-3"
     >
       {links.map((link) => {
         const isActive =
@@ -32,8 +32,8 @@ export function CandidateNav() {
             href={link.href}
             className={`shrink-0 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
               isActive
-                ? "bg-zinc-900 text-white dark:bg-white dark:text-zinc-900"
-                : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-50"
+                ? "bg-violet-500/15 text-white ring-1 ring-violet-400/30"
+                : "text-zinc-200 hover:bg-white/[0.06] hover:text-zinc-100"
             }`}
           >
             {link.label}

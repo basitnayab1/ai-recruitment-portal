@@ -49,7 +49,7 @@ export function ProfileForm({
           disabled
           className={`${FIELD_INPUT} opacity-70`}
         />
-        <p className="text-xs text-zinc-500 dark:text-zinc-400">Your email address cannot be changed.</p>
+        <p className="text-xs text-zinc-400">Your email address cannot be changed.</p>
       </div>
 
       <FloatingInput

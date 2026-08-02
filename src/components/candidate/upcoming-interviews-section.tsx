@@ -17,7 +17,7 @@ export function UpcomingInterviewsSection({
   return (
     <div className={DASHBOARD_CARD}>
       <div className={CARD_HEADER}>
-        <h2 className="text-base font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+        <h2 className="text-base font-bold tracking-tight text-white">
           Upcoming Interviews
         </h2>
         <Link href="/candidate/interviews" className={CARD_HEADER_LINK}>
@@ -28,12 +28,12 @@ export function UpcomingInterviewsSection({
       {upcoming.length === 0 ? (
         <div className="px-6 py-12 text-center">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-100 dark:bg-indigo-950/40">
-            <CalendarCheck className="h-6 w-6 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+            <CalendarCheck className="h-6 w-6 text-indigo-300" aria-hidden="true" />
           </div>
-          <p className="mt-4 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+          <p className="mt-4 text-sm font-semibold text-white">
             No interviews scheduled
           </p>
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="mt-1 text-sm text-zinc-400">
             When HR schedules an interview, it will show up here.
           </p>
         </div>
@@ -42,7 +42,7 @@ export function UpcomingInterviewsSection({
           {upcoming.map((interview, index) => (
             <motion.li
               key={interview.id}
-              initial={{ opacity: 0, y: 12 }}
+              initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1, duration: 0.35 }}
               whileHover={{ scale: 1.01 }}
@@ -50,21 +50,21 @@ export function UpcomingInterviewsSection({
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <p className="font-bold text-zinc-900 dark:text-zinc-50">{interview.jobTitle}</p>
-                  <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">{interview.company}</p>
+                  <p className="font-bold text-white">{interview.jobTitle}</p>
+                  <p className="mt-0.5 text-sm text-zinc-400">{interview.company}</p>
                 </div>
                 <InterviewStatusBadge status={interview.status} />
               </div>
               <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
                 <div>
                   <dt className="text-xs font-semibold text-zinc-400 uppercase">Date</dt>
-                  <dd className="mt-0.5 font-medium text-zinc-900 dark:text-zinc-50">
+                  <dd className="mt-0.5 font-medium text-white">
                     {interview.interviewDateLabel}
                   </dd>
                 </div>
                 <div>
                   <dt className="text-xs font-semibold text-zinc-400 uppercase">Time</dt>
-                  <dd className="mt-0.5 font-medium text-zinc-900 dark:text-zinc-50">
+                  <dd className="mt-0.5 font-medium text-white">
                     {interview.interviewTimeLabel}
                   </dd>
                 </div>

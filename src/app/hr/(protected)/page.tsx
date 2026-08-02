@@ -18,6 +18,7 @@ import { RecentApplicationsCard } from "@/components/hr/recent-applications-card
 import { RecentJobsCard } from "@/components/hr/recent-jobs-card";
 import { RecentlyUpdatedApplicationsCard } from "@/components/hr/recently-updated-applications-card";
 import { DASHBOARD_SECTION, PAGE_DESCRIPTION, PAGE_TITLE, SURFACE_CARD } from "@/lib/ui/classes";
+import { formatLongDisplayDate } from "@/lib/format/display-dates";
 
 export const metadata: Metadata = {
   title: "HR Dashboard | AI Recruitment Portal",
@@ -40,11 +41,7 @@ export default async function HRDashboardPage() {
   } = await getAnalyticsDashboardData();
 
   const firstName = profile.fullName.split(" ")[0];
-  const today = new Intl.DateTimeFormat("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-  }).format(new Date());
+  const today = formatLongDisplayDate();
 
   return (
     <div className={DASHBOARD_SECTION}>
@@ -53,7 +50,7 @@ export default async function HRDashboardPage() {
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-violet-500/5 via-transparent to-indigo-500/5" aria-hidden="true" />
         <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-sm font-semibold text-violet-600 dark:text-violet-400">{today}</p>
+            <p className="text-sm font-semibold text-violet-300">{today}</p>
             <h1 className={`${PAGE_TITLE} mt-1`}>Welcome back, {firstName}</h1>
             <p className={PAGE_DESCRIPTION}>
               Your recruitment command center — track pipeline health, interviews, and hiring
@@ -69,7 +66,7 @@ export default async function HRDashboardPage() {
 
       {/* Charts — large 2-column grid */}
       <div>
-        <h2 className="mb-5 text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+        <h2 className="mb-5 text-lg font-bold tracking-tight text-white">
           Analytics
         </h2>
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">

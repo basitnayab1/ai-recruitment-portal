@@ -15,7 +15,7 @@ export function MobileNav() {
         onClick={() => setOpen(true)}
         aria-label="Open navigation menu"
         aria-expanded={open}
-        className="rounded-xl p-2.5 text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+        className="rounded-xl p-2.5 text-zinc-200 transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-800"
       >
         <MenuIcon className="h-5 w-5" aria-hidden="true" />
       </button>

@@ -13,7 +13,7 @@ import { EMPLOYMENT_TYPE_LABELS } from "@/lib/hr/jobs";
 import { SiteHeader } from "@/components/landing/site-header";
 import { SiteFooter } from "@/components/landing/site-footer";
 import { ApplyForm } from "@/components/candidate/apply-form";
-import { DETAIL_SECTION, PAGE_LINK_BACK } from "@/lib/ui/classes";
+import { ALERT_ERROR, DETAIL_SECTION, PAGE_LINK_BACK } from "@/lib/ui/classes";
 
 export const metadata: Metadata = {
   title: "Apply | AI Recruitment Portal",
@@ -68,7 +68,7 @@ export default async function CandidateApplyPage({ params }: { params: Promise<P
   }
 
   return (
-    <div className="flex flex-1 flex-col bg-white dark:bg-black">
+    <div className="flex flex-1 flex-col bg-[#06060a]">
       <SiteHeader />
       <main className="flex-1">
         <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
@@ -78,47 +78,47 @@ export default async function CandidateApplyPage({ params }: { params: Promise<P
           </Link>
 
           <div className={`mt-6 ${DETAIL_SECTION}`}>
-            <h1 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">
+            <h1 className="text-xl font-semibold text-white">
               Apply for {job.title}
             </h1>
-            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+            <p className="mt-1 text-sm text-zinc-400">
               {job.department ? `${job.department} · ` : ""}
               {EMPLOYMENT_TYPE_LABELS[job.employmentType]}
             </p>
 
             {applicationCheck.status === "error" ? (
-              <div className="mt-6 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-300">
-                <XCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-600 dark:text-red-500" aria-hidden="true" />
+              <div className={`mt-6 flex items-start gap-3 p-5 ${ALERT_ERROR}`}>
+                <XCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-400" aria-hidden="true" />
                 <div>
                   <p className="font-medium">We couldn&apos;t check your application status.</p>
                   <p className="mt-1">{applicationCheck.message}</p>
                 </div>
               </div>
             ) : alreadyApplied ? (
-              <div className="mt-6 flex items-start gap-3 rounded-xl border border-zinc-200 bg-zinc-50 p-5 text-sm text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900/40 dark:text-zinc-300">
-                <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-green-600 dark:text-green-500" aria-hidden="true" />
+              <div className="mt-6 flex items-start gap-3 rounded-xl border border-white/10 bg-white/[0.04] p-5 text-sm text-zinc-200">
+                <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-400" aria-hidden="true" />
                 <div>
-                  <p className="font-medium text-zinc-900 dark:text-zinc-50">
+                  <p className="font-medium text-white">
                     You have already applied for this job.
                   </p>
                   <Link
                     href="/candidate/applications"
-                    className="mt-2 inline-block text-sm font-medium text-indigo-600 hover:underline dark:text-indigo-400"
+                    className="mt-2 inline-block text-sm font-medium text-violet-300 hover:underline"
                   >
                     View your applications →
                   </Link>
                 </div>
               </div>
             ) : !job.isOpen ? (
-              <div className="mt-6 flex items-start gap-3 rounded-xl border border-zinc-200 bg-zinc-50 p-5 text-sm text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900/40 dark:text-zinc-300">
-                <XCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-600 dark:text-red-500" aria-hidden="true" />
+              <div className="mt-6 flex items-start gap-3 rounded-xl border border-white/10 bg-white/[0.04] p-5 text-sm text-zinc-200">
+                <XCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-400" aria-hidden="true" />
                 <div>
-                  <p className="font-medium text-zinc-900 dark:text-zinc-50">
+                  <p className="font-medium text-white">
                     This job is now closed and no longer accepting applications.
                   </p>
                   <Link
                     href="/jobs"
-                    className="mt-2 inline-block text-sm font-medium text-indigo-600 hover:underline dark:text-indigo-400"
+                    className="mt-2 inline-block text-sm font-medium text-violet-300 hover:underline"
                   >
                     Browse open jobs →
                   </Link>
@@ -126,28 +126,28 @@ export default async function CandidateApplyPage({ params }: { params: Promise<P
               </div>
             ) : (
               <>
-                <div className="mt-6 space-y-3 rounded-xl border border-zinc-200 bg-zinc-50 p-5 dark:border-zinc-800 dark:bg-zinc-900/40">
-                  <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+                <div className="mt-6 space-y-3 rounded-xl border border-white/10 bg-white/[0.04] p-5">
+                  <h2 className="text-sm font-semibold text-white">
                     Your details
                   </h2>
                   <dl className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
                     <div>
-                      <dt className="text-zinc-500 dark:text-zinc-400">Name</dt>
-                      <dd className="font-medium text-zinc-900 dark:text-zinc-50">{profile.fullName}</dd>
+                      <dt className="text-zinc-400">Name</dt>
+                      <dd className="font-medium text-white">{profile.fullName}</dd>
                     </div>
                     <div>
-                      <dt className="text-zinc-500 dark:text-zinc-400">Email</dt>
-                      <dd className="font-medium text-zinc-900 dark:text-zinc-50">{profile.email}</dd>
+                      <dt className="text-zinc-400">Email</dt>
+                      <dd className="font-medium text-white">{profile.email}</dd>
                     </div>
                     <div>
-                      <dt className="text-zinc-500 dark:text-zinc-400">Phone</dt>
-                      <dd className="font-medium text-zinc-900 dark:text-zinc-50">
+                      <dt className="text-zinc-400">Phone</dt>
+                      <dd className="font-medium text-white">
                         {details?.phone ?? profile.phone ?? "—"}
                       </dd>
                     </div>
                     <div>
-                      <dt className="text-zinc-500 dark:text-zinc-400">Resume</dt>
-                      <dd className="flex items-center gap-1.5 font-medium text-green-700 dark:text-green-500">
+                      <dt className="text-zinc-400">Resume</dt>
+                      <dd className="flex items-center gap-1.5 font-medium text-emerald-300">
                         <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
                         {resume?.fileName ?? "Uploaded"}
                       </dd>
@@ -155,7 +155,7 @@ export default async function CandidateApplyPage({ params }: { params: Promise<P
                   </dl>
                   <Link
                     href="/candidate/profile"
-                    className="inline-block text-sm font-medium text-indigo-600 hover:underline dark:text-indigo-400"
+                    className="inline-block text-sm font-medium text-violet-300 hover:underline"
                   >
                     Edit your profile →
                   </Link>

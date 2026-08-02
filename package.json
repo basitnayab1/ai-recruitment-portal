@@ -7,7 +7,15 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "create-hr-user": "node --env-file=.env.local scripts/create-hr-user.mjs"
+    "type-check": "tsc --noEmit",
+    "create-hr-user": "node --env-file=.env.local scripts/create-hr-user.mjs",
+    "verify-copilot": "node --env-file=.env.local scripts/verify-copilot.mjs",
+    "verify-intent": "npx --yes tsx scripts/verify-intent.ts",
+    "verify-agent": "npx --yes tsx scripts/verify-agent.ts",
+    "test:intent": "npx --yes tsx scripts/test-semantic-intent.ts",
+    "test:hiring": "npx --yes tsx scripts/test-hiring-recommendation.ts",
+    "test:agent-100": "node --require ./scripts/preload-server-only.cjs --import tsx --env-file=.env.local scripts/test-agent-100.ts",
+    "test:agent-100:offline": "node --require ./scripts/preload-server-only.cjs --import tsx scripts/test-agent-100.ts --offline"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.20",
@@ -19,12 +27,16 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.43.0",
+    "groq-sdk": "^1.5.0",
+    "gsap": "^3.15.0",
     "lucide-react": "^1.28.0",
+    "mammoth": "^1.12.0",
     "next": "16.2.12",
-    "openai": "^7.2.0",
+    "ogl": "^1.0.11",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "resend": "^6.18.1",
+    "server-only": "^0.0.1",
     "sharp": "^0.35.3",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.6.0",
@@ -39,6 +51,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.12",
     "tailwindcss": "^4",
+    "tsx": "^4.23.1",
     "typescript": "^5"
   }
 }

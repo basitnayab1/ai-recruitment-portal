@@ -17,7 +17,7 @@ export function RecentActivityCard({ activity }: { activity: RecentActivityItem[
     <DashboardCardShell title="Status Changes" href="/hr/applications">
       {activity.length === 0 ? (
         <div className="px-6 py-10">
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="text-sm text-zinc-400">
             Status changes will appear here once applications start moving through your pipeline.
           </p>
         </div>
@@ -25,7 +25,7 @@ export function RecentActivityCard({ activity }: { activity: RecentActivityItem[
         <ul className="space-y-4 px-6 py-4">
           {activity.map((item) => (
             <li key={item.id} className="text-sm">
-              <p className="text-zinc-900 dark:text-zinc-50">
+              <p className="text-white">
                 <span className="font-medium">{item.candidateName}</span>{" "}
                 {item.previousStatus ? (
                   <>
@@ -42,7 +42,7 @@ export function RecentActivityCard({ activity }: { activity: RecentActivityItem[
                   {APPLICATION_STATUS_META[item.newStatus].label}
                 </span>
               </p>
-              <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
+              <p className="mt-0.5 text-xs text-zinc-400">
                 {item.jobTitle} · {formatRelativeTime(item.createdAt)}
                 {item.changedByName ? ` · by ${item.changedByName}` : ""}
               </p>

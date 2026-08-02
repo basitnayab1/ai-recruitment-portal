@@ -4,7 +4,6 @@ import { createClient } from "@/lib/supabase/server";
 import {
   AUDIT_LOG_PAGE_SIZE,
   isAuditAction,
-  type AuditAction,
   type AuditActorRole,
   type AuditEntityType,
   type AuditLogFilterOptions,
@@ -53,7 +52,12 @@ function mapAuditLogRow(row: AuditLogRow): AuditLogItem | null {
 }
 
 function sanitizeSearchTerm(value: string): string {
-  return value.replace(/[,()]/g, " ").trim();
+  return value
+    .replace(/[,().*\\]/g, " ")
+    .replace(/[%_]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 100);
 }
 
 export async function getAuditLogFilterOptions(): Promise<AuditLogFilterOptions> {

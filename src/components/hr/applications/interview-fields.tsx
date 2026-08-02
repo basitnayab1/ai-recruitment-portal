@@ -12,27 +12,31 @@ import {
 import type { InterviewFormDefaults } from "@/lib/hr/interviews";
 
 const fieldClassName =
-  "h-10 w-full rounded-lg border border-zinc-300 bg-white px-3 text-sm text-zinc-900 outline-none focus:border-zinc-500 focus:ring-2 focus:ring-zinc-200 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-500 dark:focus:ring-zinc-700";
+  "h-10 w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 text-sm text-white placeholder:text-zinc-500 outline-none focus:border-violet-400/60 focus:ring-violet-500/20 [color-scheme:dark]";
 
 const textareaClassName =
-  "w-full resize-none rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-500 focus:ring-2 focus:ring-zinc-200 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-500 dark:focus:ring-zinc-700";
+  "w-full resize-none rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-white placeholder:text-zinc-500 outline-none focus:border-violet-400/60 focus:ring-violet-500/20";
 
-export function InterviewFields({ interview }: { interview?: InterviewFormDefaults | null }) {
+export function InterviewFields({
+  interview,
+  minInterviewDate,
+}: {
+  interview?: InterviewFormDefaults | null;
+  minInterviewDate?: string;
+}) {
   const [interviewType, setInterviewType] = useState<InterviewType>(
     interview?.interviewType ?? "online"
   );
 
-  const today = new Date().toISOString().slice(0, 10);
-
   return (
-    <div className="space-y-3 rounded-lg border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900/50">
-      <p className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+    <div className="space-y-3 rounded-lg border border-white/10 bg-white/[0.04] p-4">
+      <p className="text-xs font-medium text-zinc-200">
         Interview details (saved to the interview record and included in candidate emails)
       </p>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div className="space-y-1.5 sm:col-span-2">
-          <label htmlFor="interviewerName" className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+          <label htmlFor="interviewerName" className="text-xs font-medium text-zinc-400">
             Interviewer Name *
           </label>
           <input
@@ -47,7 +51,7 @@ export function InterviewFields({ interview }: { interview?: InterviewFormDefaul
         </div>
 
         <div className="space-y-1.5">
-          <label htmlFor="interviewType" className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+          <label htmlFor="interviewType" className="text-xs font-medium text-zinc-400">
             Interview Type *
           </label>
           <select
@@ -67,7 +71,7 @@ export function InterviewFields({ interview }: { interview?: InterviewFormDefaul
         </div>
 
         <div className="space-y-1.5">
-          <label htmlFor="durationMinutes" className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+          <label htmlFor="durationMinutes" className="text-xs font-medium text-zinc-400">
             Duration *
           </label>
           <select
@@ -86,7 +90,7 @@ export function InterviewFields({ interview }: { interview?: InterviewFormDefaul
         </div>
 
         <div className="space-y-1.5">
-          <label htmlFor="interviewDate" className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+          <label htmlFor="interviewDate" className="text-xs font-medium text-zinc-400">
             Interview Date *
           </label>
           <input
@@ -94,14 +98,14 @@ export function InterviewFields({ interview }: { interview?: InterviewFormDefaul
             name="interviewDate"
             type="date"
             required
-            min={today}
+            min={minInterviewDate}
             defaultValue={interview?.interviewDate ?? ""}
             className={fieldClassName}
           />
         </div>
 
         <div className="space-y-1.5">
-          <label htmlFor="interviewTime" className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+          <label htmlFor="interviewTime" className="text-xs font-medium text-zinc-400">
             Interview Time *
           </label>
           <input
@@ -115,7 +119,7 @@ export function InterviewFields({ interview }: { interview?: InterviewFormDefaul
         </div>
 
         <div className="space-y-1.5 sm:col-span-2">
-          <label htmlFor="timezone" className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+          <label htmlFor="timezone" className="text-xs font-medium text-zinc-400">
             Time Zone *
           </label>
           <select
@@ -135,7 +139,7 @@ export function InterviewFields({ interview }: { interview?: InterviewFormDefaul
 
         {interviewType === "online" ? (
           <div className="space-y-1.5 sm:col-span-2">
-            <label htmlFor="meetingLink" className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+            <label htmlFor="meetingLink" className="text-xs font-medium text-zinc-400">
               Meeting Link *
             </label>
             <input
@@ -152,7 +156,7 @@ export function InterviewFields({ interview }: { interview?: InterviewFormDefaul
 
         {interviewType === "on_site" ? (
           <div className="space-y-1.5 sm:col-span-2">
-            <label htmlFor="officeLocation" className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+            <label htmlFor="officeLocation" className="text-xs font-medium text-zinc-400">
               Office Location *
             </label>
             <input
@@ -169,7 +173,7 @@ export function InterviewFields({ interview }: { interview?: InterviewFormDefaul
 
         {interviewType === "phone" ? (
           <div className="space-y-1.5 sm:col-span-2">
-            <label htmlFor="meetingLink" className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+            <label htmlFor="meetingLink" className="text-xs font-medium text-zinc-400">
               Optional Meeting Link
             </label>
             <input
@@ -184,7 +188,7 @@ export function InterviewFields({ interview }: { interview?: InterviewFormDefaul
         ) : null}
 
         <div className="space-y-1.5 sm:col-span-2">
-          <label htmlFor="notes" className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+          <label htmlFor="notes" className="text-xs font-medium text-zinc-400">
             Internal Notes (HR only)
           </label>
           <textarea

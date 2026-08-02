@@ -1,5 +1,6 @@
 import "server-only";
 
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import {
   isNotificationType,
@@ -56,48 +57,46 @@ function mapNotificationRow(row: NotificationRow): NotificationItem {
  * so user_id alone is not sufficient for isolation when one account holds both
  * roles.
  */
-export async function getUnreadNotificationCount(
-  userId: string,
-  role: NotificationRole
-): Promise<number> {
-  const supabase = await createClient();
+export const getUnreadNotificationCount = cache(
+  async (userId: string, role: NotificationRole): Promise<number> => {
+    const supabase = await createClient();
 
-  const { count, error } = await supabase
-    .from("notifications")
-    .select("id", { count: "exact", head: true })
-    .eq("user_id", userId)
-    .eq("role", role)
-    .eq("is_read", false);
+    const { count, error } = await supabase
+      .from("notifications")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId)
+      .eq("role", role)
+      .eq("is_read", false);
 
-  if (error) {
-    console.error("[notifications/data] Failed to count unread notifications:", error.message);
-    return 0;
+    if (error) {
+      console.error("[notifications/data] Failed to count unread notifications:", error.message);
+      return 0;
+    }
+
+    return count ?? 0;
   }
+);
 
-  return count ?? 0;
-}
+export const getNotificationPreview = cache(
+  async (userId: string, role: NotificationRole): Promise<NotificationItem[]> => {
+    const supabase = await createClient();
 
-export async function getNotificationPreview(
-  userId: string,
-  role: NotificationRole
-): Promise<NotificationItem[]> {
-  const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("notifications")
+      .select("id, title, message, type, reference_id, reference_type, is_read, created_at")
+      .eq("user_id", userId)
+      .eq("role", role)
+      .order("created_at", { ascending: false })
+      .limit(NOTIFICATION_PREVIEW_LIMIT);
 
-  const { data, error } = await supabase
-    .from("notifications")
-    .select("id, title, message, type, reference_id, reference_type, is_read, created_at")
-    .eq("user_id", userId)
-    .eq("role", role)
-    .order("created_at", { ascending: false })
-    .limit(NOTIFICATION_PREVIEW_LIMIT);
+    if (error) {
+      console.error("[notifications/data] Failed to load notification preview:", error.message);
+      return [];
+    }
 
-  if (error) {
-    console.error("[notifications/data] Failed to load notification preview:", error.message);
-    return [];
+    return ((data ?? []) as NotificationRow[]).map(mapNotificationRow);
   }
-
-  return ((data ?? []) as NotificationRow[]).map(mapNotificationRow);
-}
+);
 
 export async function getNotificationsPage(
   userId: string,

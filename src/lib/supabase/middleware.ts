@@ -1,15 +1,23 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PROTECTED_PREFIX = "/hr";
-const LOGIN_PATH = "/hr/login";
+const HR_PROTECTED_PREFIX = "/hr";
+const HR_LOGIN_PATH = "/hr/login";
+const CANDIDATE_PROTECTED_PREFIX = "/candidate";
+const CANDIDATE_PUBLIC_PREFIXES = ["/candidate/login", "/candidate/signup"];
+
+function isCandidatePublicPath(pathname: string): boolean {
+  return CANDIDATE_PUBLIC_PREFIXES.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
+  );
+}
 
 /**
  * Refreshes the Supabase auth session on every request and performs an
  * optimistic (cookie-only) redirect for unauthenticated visitors trying to
- * reach a protected `/hr` route. This is a fast pre-filter only — the
- * authoritative HR-role check happens server-side in the Data Access Layer
- * (`src/lib/auth/dal.ts`), which every protected route calls directly.
+ * reach protected `/hr` or `/candidate` routes. This is a fast pre-filter
+ * only — authoritative role checks happen in the Data Access Layer
+ * (`requireHRUser` / `requireCandidateUser`).
  *
  * Called from `src/proxy.ts`.
  */
@@ -51,17 +59,27 @@ export async function updateSession(request: NextRequest) {
   const { data: claimsData } = await supabase.auth.getClaims();
 
   const { pathname } = request.nextUrl;
-  const isProtectedRoute =
-    pathname.startsWith(PROTECTED_PREFIX) && pathname !== LOGIN_PATH;
+  const isHrProtected =
+    pathname.startsWith(HR_PROTECTED_PREFIX) && pathname !== HR_LOGIN_PATH;
+  const isCandidateProtected =
+    pathname.startsWith(CANDIDATE_PROTECTED_PREFIX) &&
+    !isCandidatePublicPath(pathname);
 
-  if (isProtectedRoute && !claimsData?.claims) {
+  if (isHrProtected && !claimsData?.claims) {
     const loginUrl = request.nextUrl.clone();
-    loginUrl.pathname = LOGIN_PATH;
+    loginUrl.pathname = HR_LOGIN_PATH;
     loginUrl.search = "";
     return NextResponse.redirect(loginUrl);
   }
 
-  if (pathname.startsWith(PROTECTED_PREFIX)) {
+  if (isCandidateProtected && !claimsData?.claims) {
+    const loginUrl = request.nextUrl.clone();
+    loginUrl.pathname = "/candidate/login";
+    loginUrl.searchParams.set("next", pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  if (isHrProtected || isCandidateProtected) {
     // Auth-sensitive responses must never be cached (by a CDN or the
     // browser), or one user's session could leak to another.
     response.headers.set("Cache-Control", "private, no-store");

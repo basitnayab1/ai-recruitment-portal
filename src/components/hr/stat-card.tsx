@@ -30,10 +30,10 @@ export function StatCard({
         />
         <div className="relative flex items-start justify-between gap-4">
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-semibold tracking-wider text-zinc-400 uppercase dark:text-zinc-500">
+            <p className="text-xs font-semibold tracking-wider text-zinc-400 uppercase">
               {label}
             </p>
-            <p className="mt-3 text-4xl font-bold tracking-tight text-zinc-900 tabular-nums sm:text-5xl dark:text-zinc-50">
+            <p className="mt-3 text-4xl font-bold tracking-tight text-white tabular-nums sm:text-5xl">
               {value.toLocaleString()}
             </p>
             {trend ? (
@@ -48,7 +48,7 @@ export function StatCard({
                   {trend.value}%
                 </span>
                 {trend.label ? (
-                  <span className="text-xs text-zinc-400 dark:text-zinc-500">{trend.label}</span>
+                  <span className="text-xs text-zinc-400">{trend.label}</span>
                 ) : null}
               </div>
             ) : null}
@@ -66,9 +66,9 @@ export function StatCard({
   }
 
   return (
-    <div className="rounded-2xl border border-zinc-200/60 bg-white/80 p-4 shadow-sm backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-800/60 dark:bg-zinc-900/80">
+    <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 shadow-[0_8px_40px_rgba(0,0,0,0.35)] backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:border-violet-400/35">
       <div className="flex items-center justify-between gap-2">
-        <p className="truncate text-[11px] font-semibold tracking-wider text-zinc-400 uppercase dark:text-zinc-500">
+        <p className="truncate text-[11px] font-semibold tracking-wider text-zinc-400 uppercase">
           {label}
         </p>
         {Icon ? (
@@ -79,7 +79,7 @@ export function StatCard({
           </div>
         ) : null}
       </div>
-      <p className="mt-2 text-2xl font-bold tracking-tight text-zinc-900 tabular-nums dark:text-zinc-50">
+      <p className="mt-2 text-2xl font-bold tracking-tight text-white tabular-nums">
         {value.toLocaleString()}
       </p>
     </div>

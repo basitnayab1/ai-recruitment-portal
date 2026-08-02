@@ -1,5 +1,6 @@
 import "server-only";
 
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 
 export const RESUME_BUCKET = "resumes";
@@ -28,30 +29,32 @@ type CandidateResumeRow = {
  * caller's own authenticated session (RLS: `auth.uid() = candidate_id`).
  * Returns `null` when no résumé has been uploaded yet — not an error.
  */
-export async function getCandidateResume(candidateId: string): Promise<CandidateResume | null> {
-  const supabase = await createClient();
+export const getCandidateResume = cache(
+  async (candidateId: string): Promise<CandidateResume | null> => {
+    const supabase = await createClient();
 
-  const { data, error } = await supabase
-    .from("candidate_resumes")
-    .select("*")
-    .eq("candidate_id", candidateId)
-    .maybeSingle();
+    const { data, error } = await supabase
+      .from("candidate_resumes")
+      .select("*")
+      .eq("candidate_id", candidateId)
+      .maybeSingle();
 
-  if (error || !data) {
-    return null;
+    if (error || !data) {
+      return null;
+    }
+
+    const row = data as CandidateResumeRow;
+
+    return {
+      candidateId: row.candidate_id,
+      storagePath: row.storage_path,
+      fileName: row.file_name,
+      fileSize: row.file_size,
+      mimeType: row.mime_type,
+      uploadedAt: row.uploaded_at,
+    };
   }
-
-  const row = data as CandidateResumeRow;
-
-  return {
-    candidateId: row.candidate_id,
-    storagePath: row.storage_path,
-    fileName: row.file_name,
-    fileSize: row.file_size,
-    mimeType: row.mime_type,
-    uploadedAt: row.uploaded_at,
-  };
-}
+);
 
 /**
  * Generates a short-lived signed URL for downloading the candidate's

@@ -22,8 +22,8 @@ export function RecentApplicationsCard({
     <DashboardCardShell title="Recent Applications" href="/hr/applications">
       {applications.length === 0 ? (
         <div className="px-6 py-12 text-center">
-          <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">No applications yet</p>
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="text-sm font-medium text-white">No applications yet</p>
+          <p className="mt-1 text-sm text-zinc-400">
             New candidate applications will show up here as soon as they&apos;re submitted.
           </p>
         </div>
@@ -55,25 +55,25 @@ export function RecentApplicationsCard({
             <tbody className={TABLE_BODY}>
               {applications.map((application) => (
                 <tr key={application.id} className={TABLE_ROW}>
-                  <td className={`${TABLE_CELL} font-medium whitespace-nowrap text-zinc-900 dark:text-zinc-50`}>
+                  <td className={`${TABLE_CELL} font-medium whitespace-nowrap text-white`}>
                     {application.candidateName}
                   </td>
-                  <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-600 dark:text-zinc-400`}>
+                  <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-200`}>
                     {application.jobTitle}
                   </td>
                   <td className={TABLE_CELL}>
                     <StatusBadge status={application.status} />
                   </td>
-                  <td className={`${TABLE_CELL} text-zinc-600 dark:text-zinc-400`}>
+                  <td className={`${TABLE_CELL} text-zinc-200`}>
                     {formatScore(application.aiScore)}
                   </td>
-                  <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-600 dark:text-zinc-400`}>
+                  <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-200`}>
                     {formatDate(application.submittedAt)}
                   </td>
                   <td className={`${TABLE_CELL} text-right whitespace-nowrap`}>
                     <Link
                       href={`/hr/applications/${application.id}`}
-                      className="font-medium text-zinc-600 transition-colors hover:text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2 rounded-sm dark:text-zinc-400 dark:hover:text-zinc-50"
+                      className="font-medium text-zinc-200 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2 rounded-sm"
                     >
                       View Details
                     </Link>

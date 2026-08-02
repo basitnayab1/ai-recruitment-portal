@@ -41,11 +41,11 @@ export function DashboardQuickActions() {
             <action.icon className="h-4.5 w-4.5 text-white" aria-hidden="true" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-bold text-zinc-900 dark:text-zinc-50">{action.label}</p>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">{action.description}</p>
+            <p className="text-sm font-bold text-white">{action.label}</p>
+            <p className="text-xs text-zinc-400">{action.description}</p>
           </div>
           <ArrowRight
-            className="h-4 w-4 shrink-0 text-zinc-300 transition-transform group-hover:translate-x-0.5 group-hover:text-violet-500 dark:text-zinc-600"
+            className="h-4 w-4 shrink-0 text-zinc-200 transition-transform group-hover:translate-x-0.5 group-hover:text-violet-300"
             aria-hidden="true"
           />
         </Link>

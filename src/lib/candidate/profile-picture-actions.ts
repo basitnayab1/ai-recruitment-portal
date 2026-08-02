@@ -103,6 +103,8 @@ export async function deleteProfilePicture(
   _prevState: DeleteProfilePictureState,
   _formData: FormData
 ): Promise<DeleteProfilePictureState> {
+  void _prevState;
+  void _formData;
   const profile = await requireCandidateUser();
 
   const existing = await getCandidateProfilePicture(profile.id);

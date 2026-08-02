@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { formatDisplayYear } from "@/lib/format/display-dates";
 
 const FOOTER_LINKS: { heading: string; links: { label: string; href: string }[] }[] = [
   {
@@ -29,26 +30,24 @@ const FOOTER_LINKS: { heading: string; links: { label: string; href: string }[] 
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-zinc-200 bg-white dark:border-zinc-800 dark:bg-black">
+    <footer className="relative border-t border-white/10">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-10 md:grid-cols-4">
           <div className="col-span-2 md:col-span-1">
-            <Link href="/" className="flex items-center gap-2">
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 text-sm font-bold text-white">
+            <Link href="/" className="flex items-center gap-2.5">
+              <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-500 text-sm font-bold text-white shadow-[0_0_20px_rgba(139,92,246,0.4)]">
                 AI
               </span>
-              <span className="text-base font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-                RecruitAI
-              </span>
+              <span className="text-base font-semibold tracking-tight text-white">RecruitAI</span>
             </Link>
-            <p className="mt-4 max-w-xs text-sm text-zinc-500 dark:text-zinc-400">
-              A modern recruitment platform connecting candidates with real opportunities, faster.
+            <p className="mt-4 max-w-xs text-sm leading-relaxed text-zinc-400">
+              A cinematic AI recruitment platform connecting talent with opportunity.
             </p>
           </div>
 
           {FOOTER_LINKS.map((column) => (
             <div key={column.heading}>
-              <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+              <h3 className="text-[11px] font-semibold tracking-[0.18em] text-zinc-300 uppercase">
                 {column.heading}
               </h3>
               <ul className="mt-4 space-y-3">
@@ -56,7 +55,7 @@ export function SiteFooter() {
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="text-sm text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
+                      className="text-sm text-zinc-400 transition-colors hover:text-violet-300"
                     >
                       {link.label}
                     </Link>
@@ -67,9 +66,10 @@ export function SiteFooter() {
           ))}
         </div>
 
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-zinc-200 pt-8 sm:flex-row dark:border-zinc-800">
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            &copy; {new Date().getFullYear()} RecruitAI. All rights reserved.
+        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 sm:flex-row">
+          <p className="text-sm text-zinc-500">&copy; {formatDisplayYear()} RecruitAI. All rights reserved.</p>
+          <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-500 uppercase">
+            Inspired by immersive UI craft
           </p>
         </div>
       </div>

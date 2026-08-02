@@ -51,7 +51,7 @@ export default async function CandidateProfilePage({
           {safeNext ? (
             <Link
               href={safeNext}
-              className="mt-2 inline-flex items-center gap-1.5 font-semibold text-amber-900 hover:underline dark:text-amber-200"
+              className="mt-2 inline-flex items-center gap-1.5 font-semibold text-amber-900 hover:underline"
             >
               Back to job
               <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
@@ -64,10 +64,10 @@ export default async function CandidateProfilePage({
         <div className="space-y-6 lg:col-span-2">
           <MotionFadeIn>
             <div className={DETAIL_SECTION}>
-              <h2 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+              <h2 className="text-lg font-bold tracking-tight text-white">
                 Personal Information
               </h2>
-              <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+              <p className="mt-1 text-sm text-zinc-400">
                 Your basic contact details and profile picture.
               </p>
               <div className="mt-6 space-y-8">
@@ -82,18 +82,7 @@ export default async function CandidateProfilePage({
           </MotionFadeIn>
 
           <MotionFadeIn delay={0.1}>
-            <div className={DETAIL_SECTION}>
-              <h2 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-                Additional Details
-              </h2>
-              <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-                Personal, professional, and online presence details recruiters use to evaluate your
-                applications.
-              </p>
-              <div className="mt-6">
-                <ProfileDetailsForm details={details} />
-              </div>
-            </div>
+            <ProfileDetailsForm details={details} />
           </MotionFadeIn>
         </div>
 

@@ -76,35 +76,35 @@ export function CandidatesTable({
               <td className="px-0 py-0">
                 <Link
                   href={`/hr/candidates/${candidate.id}`}
-                  className="block px-6 py-4 font-medium whitespace-nowrap text-zinc-900 transition-colors hover:text-zinc-600 dark:text-zinc-50 dark:hover:text-zinc-300"
+                  className="block px-6 py-4 font-medium whitespace-nowrap text-white transition-colors hover:text-zinc-200"
                 >
                   {candidate.fullName}
                 </Link>
               </td>
-              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-600 dark:text-zinc-400`}>
+              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-200`}>
                 {candidate.email}
               </td>
-              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-600 dark:text-zinc-400`}>
+              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-200`}>
                 {candidate.phone ?? "—"}
               </td>
-              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-600 dark:text-zinc-400`}>
+              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-200`}>
                 {candidate.yearsOfExperience != null ? `${candidate.yearsOfExperience} yrs` : "—"}
               </td>
-              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-600 dark:text-zinc-400`}>
+              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-200`}>
                 {candidate.location ?? "—"}
               </td>
               <td className={`${TABLE_CELL} whitespace-nowrap`}>
                 <span
                   className={
                     candidate.hasResume
-                      ? "inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300"
-                      : "inline-flex items-center rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400"
+                      ? "inline-flex items-center rounded-full border border-emerald-400/30 bg-emerald-500/15 px-2.5 py-0.5 text-xs font-medium text-emerald-300"
+                      : "inline-flex items-center rounded-full border border-white/10 bg-white/10 px-2.5 py-0.5 text-xs font-medium text-zinc-400"
                   }
                 >
                   {candidate.hasResume ? "Yes" : "No"}
                 </span>
               </td>
-              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-600 dark:text-zinc-400`}>
+              <td className={`${TABLE_CELL} whitespace-nowrap text-zinc-200`}>
                 {formatDate(candidate.createdAt)}
               </td>
             </tr>

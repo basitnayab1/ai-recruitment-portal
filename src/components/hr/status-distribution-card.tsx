@@ -11,10 +11,10 @@ export function StatusDistributionCard({
 }) {
   return (
     <div className={CHART_CARD}>
-      <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">Application Status</h2>
+      <h2 className="text-base font-semibold text-white">Application Status</h2>
 
       {total === 0 ? (
-        <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400">
+        <p className="mt-4 text-sm text-zinc-400">
           No applications have been submitted yet.
         </p>
       ) : (
@@ -27,10 +27,10 @@ export function StatusDistributionCard({
             return (
               <li key={status}>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-zinc-600 dark:text-zinc-400">{meta.label}</span>
-                  <span className="font-medium text-zinc-900 dark:text-zinc-50">{count}</span>
+                  <span className="text-zinc-200">{meta.label}</span>
+                  <span className="font-medium text-white">{count}</span>
                 </div>
-                <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-900">
+                <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-white/10">
                   <div
                     className={`h-full rounded-full transition-all ${meta.barClassName}`}
                     style={{ width: `${percent}%` }}

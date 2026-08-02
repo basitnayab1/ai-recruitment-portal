@@ -37,7 +37,7 @@ function DefaultAvatar({
 
   return (
     <span
-      className={`inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 ${size === "lg" ? "text-lg font-semibold" : "text-xs font-medium"} ${className}`}
+      className={`inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-zinc-800 text-zinc-200 ${size === "lg" ? "text-lg font-semibold" : "text-xs font-medium"} ${className}`}
       style={{ width: dimension, height: dimension }}
       aria-label={`${name} avatar`}
     >
@@ -64,7 +64,7 @@ export function CandidateAvatar({
 }) {
   const [loadFailed, setLoadFailed] = useState(false);
   const dimension = SIZE_PX[size];
-  const sharedClassName = `inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800 ${className}`;
+  const sharedClassName = `inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-white/10 ${className}`;
 
   if (!pictureSrc || loadFailed) {
     return <DefaultAvatar name={name} size={size} className={className} />;

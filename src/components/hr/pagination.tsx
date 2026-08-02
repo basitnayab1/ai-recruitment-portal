@@ -35,14 +35,14 @@ export function Pagination({
 
   return (
     <nav className={PAGINATION_BAR} aria-label="Pagination">
-      <p className="text-sm text-zinc-500 dark:text-zinc-400">
+      <p className="text-sm text-zinc-400">
         Showing{" "}
-        <span className="font-bold text-zinc-800 dark:text-zinc-200">{from}</span>–
-        <span className="font-bold text-zinc-800 dark:text-zinc-200">{to}</span> of{" "}
-        <span className="font-bold text-zinc-800 dark:text-zinc-200">{total}</span>
+        <span className="font-bold text-zinc-100">{from}</span>–
+        <span className="font-bold text-zinc-100">{to}</span> of{" "}
+        <span className="font-bold text-zinc-100">{total}</span>
       </p>
       <div className="flex items-center gap-2">
-        <span className="hidden rounded-lg bg-zinc-100 px-3 py-1.5 text-xs font-bold text-zinc-600 sm:inline dark:bg-zinc-800 dark:text-zinc-400">
+        <span className="hidden rounded-lg border border-white/10 bg-white/10 px-3 py-1.5 text-xs font-bold text-zinc-200 sm:inline">
           Page {page} of {totalPages}
         </span>
         {page > 1 ? (

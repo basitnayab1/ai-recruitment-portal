@@ -76,11 +76,50 @@ export type CandidateProfileDetails = {
   yearsOfExperience: number | null;
   highestQualification: HighestQualification | null;
   currentCompany: string | null;
+  currentSalary: number | null;
   expectedSalary: number | null;
   noticePeriod: NoticePeriod | null;
+  skills: string[];
   linkedinUrl: string | null;
   portfolioUrl: string | null;
   githubUrl: string | null;
   profileCompletion: number;
   updatedAt: string;
 };
+
+/**
+ * Parses skills FormData payload.
+ * Prefers `|||` delimiter (chip UI); also accepts comma/semicolon for older forms.
+ */
+export function parseSkillsList(value: FormDataEntryValue | null | undefined): string[] {
+  const str = String(value ?? "").trim();
+  if (!str) return [];
+  const parts = str.includes("|||") ? str.split("|||") : str.split(/[,;\n]+/);
+  const seen = new Set<string>();
+  const skills: string[] = [];
+  for (const part of parts) {
+    const skill = part.trim();
+    if (!skill) continue;
+    const key = skill.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    skills.push(skill);
+  }
+  return skills;
+}
+
+export function normalizeSkillsArray(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  const seen = new Set<string>();
+  const skills: string[] = [];
+  for (const item of value) {
+    if (typeof item !== "string") continue;
+    const skill = item.trim();
+    if (!skill) continue;
+    const key = skill.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    skills.push(skill);
+  }
+  return skills;
+}

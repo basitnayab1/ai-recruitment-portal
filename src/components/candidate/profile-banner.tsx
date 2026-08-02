@@ -19,7 +19,7 @@ export function ProfileBanner({
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
+      initial={false}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45 }}
       className="relative overflow-hidden rounded-2xl border border-zinc-200/60 bg-white/80 shadow-[0_8px_32px_rgba(0,0,0,0.08)] backdrop-blur-sm dark:border-zinc-800/60 dark:bg-zinc-900/80"
@@ -40,10 +40,10 @@ export function ProfileBanner({
               <CandidateAvatar name={fullName} pictureSrc={pictureUrl} size="lg" />
             </div>
             <div className="pb-1">
-              <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-3xl">
+              <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
                 {fullName}
               </h1>
-              <p className="text-sm text-zinc-500 dark:text-zinc-400">{email}</p>
+              <p className="text-sm text-zinc-400">{email}</p>
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -51,11 +51,11 @@ export function ProfileBanner({
               Manage Resume
             </Link>
             {completionPercentage < 100 ? (
-              <span className="inline-flex h-11 items-center rounded-xl bg-violet-100 px-4 text-sm font-bold text-violet-700 dark:bg-violet-950/50 dark:text-violet-300">
+              <span className="inline-flex h-11 items-center rounded-xl bg-violet-100 px-4 text-sm font-bold text-violet-700 dark:bg-violet-950/50">
                 {completionPercentage}% Complete
               </span>
             ) : (
-              <span className="inline-flex h-11 items-center rounded-xl bg-emerald-100 px-4 text-sm font-bold text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400">
+              <span className="inline-flex h-11 items-center rounded-xl bg-emerald-100 px-4 text-sm font-bold text-emerald-700 dark:bg-emerald-950/50">
                 Profile Complete ✓
               </span>
             )}
@@ -64,8 +64,8 @@ export function ProfileBanner({
 
         <div className="mt-6 max-w-md">
           <div className="mb-2 flex items-center justify-between text-sm">
-            <span className="font-semibold text-zinc-600 dark:text-zinc-400">Profile completion</span>
-            <span className="font-bold text-violet-600 dark:text-violet-400">{completionPercentage}%</span>
+            <span className="font-semibold text-zinc-200">Profile completion</span>
+            <span className="font-bold text-violet-300">{completionPercentage}%</span>
           </div>
           <MotionProgressBar value={completionPercentage} />
         </div>

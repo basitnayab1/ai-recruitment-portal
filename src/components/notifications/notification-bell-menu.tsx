@@ -57,7 +57,7 @@ export function NotificationBellMenu({
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-zinc-200/80 bg-white/80 text-zinc-600 transition-all hover:border-violet-300 hover:bg-violet-50/50 hover:text-violet-600 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-500/10 dark:border-zinc-700 dark:bg-zinc-900/80 dark:text-zinc-400 dark:hover:border-violet-500/40 dark:hover:bg-violet-500/10"
+        className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-zinc-200 transition-all hover:border-violet-400/40 hover:bg-violet-500/10 hover:text-violet-200 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-500/10"
         aria-label={`Notifications${unreadCount > 0 ? `, ${unreadCount} unread` : ""}`}
         aria-expanded={open}
       >
@@ -71,13 +71,13 @@ export function NotificationBellMenu({
 
       {open ? (
         <div className={`absolute right-0 z-50 mt-2 w-[min(100vw-2rem,24rem)] overflow-hidden shadow-lg ${SURFACE_CARD}`}>
-          <div className="flex items-center justify-between border-b border-zinc-200 px-4 py-3 dark:border-zinc-800">
-            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">Notifications</h2>
+          <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
+            <h2 className="text-sm font-semibold text-white">Notifications</h2>
             {unreadCount > 0 ? (
               <form action={markAllNotificationsReadAction.bind(null, role)}>
                 <button
                   type="submit"
-                  className="text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-400"
+                  className="text-xs font-medium text-violet-300 hover:underline"
                 >
                   Mark all read
                 </button>
@@ -87,35 +87,35 @@ export function NotificationBellMenu({
 
           {preview.length === 0 ? (
             <div className="px-4 py-10 text-center">
-              <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">No notifications yet</p>
-              <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+              <p className="text-sm font-medium text-white">No notifications yet</p>
+              <p className="mt-1 text-xs text-zinc-400">
                 Updates about applications and interviews will appear here.
               </p>
             </div>
           ) : (
-            <ul className="max-h-80 overflow-y-auto divide-y divide-zinc-100 dark:divide-zinc-900">
+            <ul className="max-h-80 overflow-y-auto divide-y divide-white/[0.06]">
               {preview.map((notification) => {
                 const href = getNotificationHref(notification, role);
 
                 return (
-                  <li key={notification.id} className={notification.isRead ? "bg-white dark:bg-zinc-950" : "bg-indigo-50/40 dark:bg-indigo-950/20"}>
+                  <li key={notification.id} className={notification.isRead ? "bg-transparent" : "bg-indigo-500/10"}>
                     <div className="flex items-start gap-3 px-4 py-3">
                       <span
-                        className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${notification.isRead ? "bg-zinc-300 dark:bg-zinc-700" : "bg-indigo-500"}`}
+                        className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${notification.isRead ? "bg-zinc-600" : "bg-indigo-400"}`}
                         aria-hidden="true"
                       />
                       <div className="min-w-0 flex-1">
                         <Link
                           href={href}
                           onClick={() => setOpen(false)}
-                          className="block text-sm font-medium text-zinc-900 hover:underline dark:text-zinc-50"
+                          className="block text-sm font-medium text-white hover:underline"
                         >
                           {notification.title}
                         </Link>
-                        <p className="mt-0.5 line-clamp-2 text-xs text-zinc-600 dark:text-zinc-400">
+                        <p className="mt-0.5 line-clamp-2 text-xs text-zinc-200">
                           {notification.message}
                         </p>
-                        <p className="mt-1 text-[10px] text-zinc-400 dark:text-zinc-500">
+                        <p className="mt-1 text-[10px] text-zinc-400">
                           <NotificationRelativeTime createdAt={notification.createdAt} />
                         </p>
                       </div>
@@ -123,7 +123,7 @@ export function NotificationBellMenu({
                         <form action={markNotificationReadAction.bind(null, notification.id, role)}>
                           <button
                             type="submit"
-                            className="shrink-0 text-[10px] font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
+                            className="shrink-0 text-[10px] font-medium text-zinc-500 hover:text-white"
                           >
                             Mark read
                           </button>
@@ -136,11 +136,11 @@ export function NotificationBellMenu({
             </ul>
           )}
 
-          <div className="border-t border-zinc-200 px-4 py-3 dark:border-zinc-800">
+          <div className="border-t border-white/10 px-4 py-3">
             <Link
               href={notificationsPath}
               onClick={() => setOpen(false)}
-              className="text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-400"
+              className="text-xs font-medium text-violet-300 hover:underline"
             >
               View all notifications
             </Link>

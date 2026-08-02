@@ -1,5 +1,6 @@
 import "server-only";
 
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { PROFILE_PICTURE_BUCKET } from "@/lib/candidate/profile-picture-constants";
 
@@ -32,28 +33,28 @@ function mapRow(row: CandidateProfilePictureRow): CandidateProfilePicture {
   };
 }
 
-export async function getCandidateProfilePicture(
-  candidateId: string
-): Promise<CandidateProfilePicture | null> {
-  const supabase = await createClient();
+export const getCandidateProfilePicture = cache(
+  async (candidateId: string): Promise<CandidateProfilePicture | null> => {
+    const supabase = await createClient();
 
-  const { data, error } = await supabase
-    .from("candidate_profile_pictures")
-    .select("*")
-    .eq("candidate_id", candidateId)
-    .maybeSingle();
+    const { data, error } = await supabase
+      .from("candidate_profile_pictures")
+      .select("*")
+      .eq("candidate_id", candidateId)
+      .maybeSingle();
 
-  if (error) {
-    console.error("[profile-picture-data] Failed to load profile picture:", error.message);
-    return null;
+    if (error) {
+      console.error("[profile-picture-data] Failed to load profile picture:", error.message);
+      return null;
+    }
+
+    if (!data) {
+      return null;
+    }
+
+    return mapRow(data as CandidateProfilePictureRow);
   }
-
-  if (!data) {
-    return null;
-  }
-
-  return mapRow(data as CandidateProfilePictureRow);
-}
+);
 
 /**
  * Returns the set of candidate ids that currently have a profile picture on file.

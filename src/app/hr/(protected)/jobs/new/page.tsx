@@ -16,14 +16,14 @@ export default async function NewJobPage() {
       <div>
         <Link
           href="/hr/jobs"
-          className="text-sm font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
+          className="text-sm font-medium text-zinc-500 hover:text-white"
         >
           ← Back to Jobs
         </Link>
-        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-white">
           Create Job
         </h1>
-        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+        <p className="mt-1 text-sm text-zinc-400">
           Fill in the details for the new job posting.
         </p>
       </div>

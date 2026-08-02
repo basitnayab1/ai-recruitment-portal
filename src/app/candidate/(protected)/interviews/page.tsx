@@ -26,7 +26,7 @@ export default async function CandidateInterviewsPage() {
       />
 
       {upcoming.length > 0 ? (
-        <p className="rounded-xl border border-violet-200/80 bg-violet-50/80 px-4 py-3 text-sm font-medium text-violet-800 dark:border-violet-900/50 dark:bg-violet-950/30 dark:text-violet-300">
+        <p className="rounded-xl border border-violet-400/30 bg-violet-500/10 px-4 py-3 text-sm font-medium text-violet-200">
           You have {upcoming.length} upcoming interview{upcoming.length === 1 ? "" : "s"}.
         </p>
       ) : null}
@@ -45,12 +45,12 @@ export default async function CandidateInterviewsPage() {
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0 space-y-2">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-50">
+                      <h2 className="text-xl font-bold text-white">
                         {interview.jobTitle}
                       </h2>
                       <InterviewStatusBadge status={interview.status} />
                     </div>
-                    <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                    <p className="text-sm text-zinc-200">
                       {interview.company}
                       {interview.department ? ` · ${interview.department}` : ""}
                     </p>
@@ -71,45 +71,45 @@ export default async function CandidateInterviewsPage() {
                 </div>
 
                 <dl className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  <div className="rounded-xl bg-zinc-50/80 p-4 dark:bg-zinc-900/40">
+                  <div className="rounded-xl border border-white/10 bg-white/[0.04] p-4">
                     <dt className="text-xs font-bold tracking-wider text-zinc-400 uppercase">Date</dt>
-                    <dd className="mt-1 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+                    <dd className="mt-1 text-sm font-semibold text-white">
                       {interview.interviewDateLabel}
                     </dd>
                   </div>
-                  <div className="rounded-xl bg-zinc-50/80 p-4 dark:bg-zinc-900/40">
+                  <div className="rounded-xl border border-white/10 bg-white/[0.04] p-4">
                     <dt className="text-xs font-bold tracking-wider text-zinc-400 uppercase">Time</dt>
-                    <dd className="mt-1 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+                    <dd className="mt-1 text-sm font-semibold text-white">
                       {interview.interviewTimeLabel}
                     </dd>
                   </div>
-                  <div className="rounded-xl bg-zinc-50/80 p-4 dark:bg-zinc-900/40">
+                  <div className="rounded-xl border border-white/10 bg-white/[0.04] p-4">
                     <dt className="text-xs font-bold tracking-wider text-zinc-400 uppercase">Status</dt>
                     <dd className="mt-1">
                       <InterviewStatusBadge status={interview.status} />
                     </dd>
                   </div>
-                  <div className="rounded-xl bg-zinc-50/80 p-4 dark:bg-zinc-900/40">
+                  <div className="rounded-xl border border-white/10 bg-white/[0.04] p-4">
                     <dt className="text-xs font-bold tracking-wider text-zinc-400 uppercase">Type</dt>
-                    <dd className="mt-1 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+                    <dd className="mt-1 text-sm font-semibold text-white">
                       {interview.typeLabel}
                     </dd>
                   </div>
-                  <div className="rounded-xl bg-zinc-50/80 p-4 dark:bg-zinc-900/40">
+                  <div className="rounded-xl border border-white/10 bg-white/[0.04] p-4">
                     <dt className="text-xs font-bold tracking-wider text-zinc-400 uppercase">Duration</dt>
-                    <dd className="mt-1 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+                    <dd className="mt-1 text-sm font-semibold text-white">
                       {interview.durationLabel}
                     </dd>
                   </div>
-                  <div className="rounded-xl bg-zinc-50/80 p-4 dark:bg-zinc-900/40">
+                  <div className="rounded-xl border border-white/10 bg-white/[0.04] p-4">
                     <dt className="text-xs font-bold tracking-wider text-zinc-400 uppercase">Interviewer</dt>
-                    <dd className="mt-1 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+                    <dd className="mt-1 text-sm font-semibold text-white">
                       {interview.interviewerName}
                     </dd>
                   </div>
                   {interview.meetingLink ? (
-                    <div className="rounded-xl bg-violet-50/80 p-4 sm:col-span-2 lg:col-span-3 dark:bg-violet-950/20">
-                      <dt className="text-xs font-bold tracking-wider text-violet-500 uppercase">
+                    <div className="rounded-xl border border-violet-400/30 bg-violet-500/10 p-4 sm:col-span-2 lg:col-span-3">
+                      <dt className="text-xs font-bold tracking-wider text-violet-300 uppercase">
                         Meeting Link
                       </dt>
                       <dd className="mt-1 break-all text-sm">
@@ -117,7 +117,7 @@ export default async function CandidateInterviewsPage() {
                           href={interview.meetingLink}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="font-semibold text-violet-600 hover:underline dark:text-violet-400"
+                          className="font-semibold text-violet-300 hover:underline"
                         >
                           {interview.meetingLink}
                         </Link>
@@ -125,11 +125,11 @@ export default async function CandidateInterviewsPage() {
                     </div>
                   ) : null}
                   {interview.officeLocation ? (
-                    <div className="rounded-xl bg-zinc-50/80 p-4 sm:col-span-2 lg:col-span-3 dark:bg-zinc-900/40">
+                    <div className="rounded-xl border border-white/10 bg-white/[0.04] p-4 sm:col-span-2 lg:col-span-3">
                       <dt className="text-xs font-bold tracking-wider text-zinc-400 uppercase">
                         Office Location
                       </dt>
-                      <dd className="mt-1 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+                      <dd className="mt-1 text-sm font-semibold text-white">
                         {interview.officeLocation}
                       </dd>
                     </div>

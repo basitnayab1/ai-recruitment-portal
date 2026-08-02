@@ -6,11 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { applyToJob, type ApplyToJobState } from "@/lib/candidate/application-actions";
 import { NOTICE_PERIODS, NOTICE_PERIOD_LABELS } from "@/lib/candidate/profile-details";
+import { ALERT_ERROR, FIELD_INPUT, SELECT_INPUT } from "@/lib/ui/classes";
 
 const initialState: ApplyToJobState = undefined;
-
-const selectClassName =
-  "flex h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-input/30";
 
 export function ApplyForm({
   jobId,
@@ -48,7 +46,7 @@ export function ApplyForm({
             name="noticePeriod"
             defaultValue={defaultNoticePeriod ?? ""}
             disabled={pending}
-            className={selectClassName}
+            className={SELECT_INPUT}
           >
             <option value="">Select notice period</option>
             {NOTICE_PERIODS.map((value) => (
@@ -68,14 +66,14 @@ export function ApplyForm({
           rows={5}
           disabled={pending}
           placeholder="Tell the hiring team why you're a great fit for this role…"
-          className="w-full resize-none rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 outline-none transition-colors focus:border-zinc-500 focus:ring-2 focus:ring-zinc-200 disabled:cursor-not-allowed disabled:opacity-60 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-500 dark:focus:ring-zinc-700"
+          className={`${FIELD_INPUT} min-h-[120px] resize-none py-3`}
         />
       </div>
 
       {state?.status === "error" ? (
         <p
           role="alert"
-          className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950/40 dark:text-red-400"
+          className={ALERT_ERROR}
         >
           {state.message}
         </p>

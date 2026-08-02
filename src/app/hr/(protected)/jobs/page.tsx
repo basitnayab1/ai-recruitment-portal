@@ -9,7 +9,7 @@ import { JobsTable } from "@/components/hr/jobs/jobs-table";
 import { EmptyState } from "@/components/hr/empty-state";
 import { JobsIcon } from "@/components/hr/icons";
 import { PageHeader } from "@/components/shared/page-header";
-import { BTN_PRIMARY, PAGE_STACK } from "@/lib/ui/classes";
+import { BTN_OUTLINE, BTN_PRIMARY, PAGE_STACK } from "@/lib/ui/classes";
 
 export const metadata: Metadata = {
   title: "Jobs | AI Recruitment Portal",
@@ -45,9 +45,14 @@ export default async function HRJobsPage({
         title="Jobs"
         description="Manage job postings for your organization."
         actions={
-          <Link href="/hr/jobs/new" className={BTN_PRIMARY}>
-            Create Job
-          </Link>
+          <div className="flex flex-wrap gap-2">
+            <Link href="/hr/jobs/new" className={BTN_OUTLINE}>
+              ✨ Generate with AI
+            </Link>
+            <Link href="/hr/jobs/new" className={BTN_PRIMARY}>
+              Create Job
+            </Link>
+          </div>
         }
       />
 

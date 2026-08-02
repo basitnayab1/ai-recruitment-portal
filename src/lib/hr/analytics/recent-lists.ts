@@ -48,7 +48,11 @@ export async function fetchRecentLists(): Promise<{
   const supabase = await createClient();
 
   const [jobsResult, recentApplicationsResult, recentlyUpdatedResult] = await Promise.all([
-    supabase.from("jobs").select("id, title, status, department, created_at"),
+    supabase
+      .from("jobs")
+      .select("id, title, status, department, created_at")
+      .order("created_at", { ascending: false })
+      .limit(RECENT_JOBS_LIMIT),
     supabase
       .from("applications")
       .select(
@@ -69,16 +73,13 @@ export async function fetchRecentLists(): Promise<{
 
   const jobRows = (unwrap(jobsResult, "jobs for recent lists") ?? []) as JobRow[];
 
-  const recentJobs: RecentJob[] = [...jobRows]
-    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-    .slice(0, RECENT_JOBS_LIMIT)
-    .map((row) => ({
-      id: row.id,
-      title: row.title,
-      department: row.department,
-      status: isJobStatus(row.status) ? row.status : "draft",
-      createdAt: row.created_at,
-    }));
+  const recentJobs: RecentJob[] = jobRows.map((row) => ({
+    id: row.id,
+    title: row.title,
+    department: row.department,
+    status: isJobStatus(row.status) ? row.status : "draft",
+    createdAt: row.created_at,
+  }));
 
   const recentApplicationRows = (unwrap(recentApplicationsResult, "recent applications") ??
     []) as unknown as RecentApplicationRow[];

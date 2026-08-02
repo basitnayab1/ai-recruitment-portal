@@ -86,7 +86,6 @@ export async function updateApplicationStatusAction(
 
     const interviewResult = await createInterviewForApplication({
       applicationId,
-      actor: hrProfile,
       parsed: parsedResult.data,
     });
 

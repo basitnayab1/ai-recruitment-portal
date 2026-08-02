@@ -6,6 +6,27 @@ export type InterviewType = (typeof INTERVIEW_TYPES)[number];
 export const INTERVIEW_STATUSES = ["scheduled", "cancelled", "completed"] as const;
 export type InterviewStatus = (typeof INTERVIEW_STATUSES)[number];
 
+/**
+ * Pure helper: builds a human-readable interview location string.
+ * Safe for Server and Client Components (no browser APIs).
+ */
+export function resolveInterviewLocation(
+  interviewType: InterviewType | undefined,
+  meetingLink: string | null | undefined,
+  officeLocation: string | null | undefined
+): string {
+  if (interviewType === "online") {
+    return meetingLink?.trim() || "Online meeting — link to be shared";
+  }
+  if (interviewType === "on_site") {
+    return officeLocation?.trim() || "Office location to be confirmed";
+  }
+  if (interviewType === "phone") {
+    return meetingLink?.trim() || "HR will call at the scheduled time";
+  }
+  return meetingLink?.trim() || officeLocation?.trim() || "";
+}
+
 export const INTERVIEW_TYPE_LABELS: Record<InterviewType, string> = {
   online: "Online",
   on_site: "On-site",
@@ -19,9 +40,9 @@ export const INTERVIEW_STATUS_LABELS: Record<InterviewStatus, string> = {
 };
 
 export const INTERVIEW_STATUS_BADGE_CLASSNAME: Record<InterviewStatus, string> = {
-  scheduled: "bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300",
-  cancelled: "bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-300",
-  completed: "bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-300",
+  scheduled: "border border-blue-400/30 bg-blue-500/15 text-blue-200",
+  cancelled: "border border-red-400/30 bg-red-500/15 text-red-300",
+  completed: "border border-emerald-400/30 bg-emerald-500/15 text-emerald-300",
 };
 
 export const INTERVIEW_DURATIONS = [15, 30, 45, 60, 90, 120] as const;

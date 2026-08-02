@@ -1,6 +1,5 @@
 import "server-only";
 
-import sharp from "sharp";
 import {
   ALLOWED_PROFILE_PICTURE_MIME_TYPES,
   PROFILE_PICTURE_MAX_DIMENSION,
@@ -54,6 +53,10 @@ export async function processProfilePicture(file: File): Promise<ProcessedProfil
   if (!sourceMimeType) {
     return null;
   }
+
+  // Lazy-load sharp so unrelated server actions on the profile page are not
+  // crashed by a broken native sharp binary at module-eval time.
+  const sharp = (await import("sharp")).default;
 
   const inputBuffer = Buffer.from(await file.arrayBuffer());
   let pipeline = sharp(inputBuffer, { failOn: "none" }).rotate();

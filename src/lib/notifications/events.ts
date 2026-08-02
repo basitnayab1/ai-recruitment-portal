@@ -231,7 +231,7 @@ export async function notifyCandidateInterviewCancelled({
 
 export async function notifyHRInterviewUpdated({
   applicationId,
-  interviewId,
+  interviewId: _interviewId,
   jobTitle,
   actionLabel,
 }: {
@@ -240,6 +240,7 @@ export async function notifyHRInterviewUpdated({
   jobTitle: string;
   actionLabel: "scheduled" | "rescheduled" | "cancelled" | "updated";
 }): Promise<void> {
+  void _interviewId;
   const actionText =
     actionLabel === "updated"
       ? "updated"
