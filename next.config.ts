@@ -77,6 +77,11 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
   experimental: {
     optimizePackageImports: ["framer-motion"],
+    // Allow larger profile-picture FormData so compression can run server-side.
+    // App still enforces a 1 MB limit on the final processed image before Supabase.
+    serverActions: {
+      bodySizeLimit: "5mb",
+    },
   },
   turbopack: {
     root: import.meta.dirname,
