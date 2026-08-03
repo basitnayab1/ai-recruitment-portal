@@ -15,7 +15,7 @@ export type DeleteResumeState =
   | { status: "error"; message: string }
   | undefined;
 
-const MAX_RESUME_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
+const MAX_RESUME_SIZE_BYTES = 1 * 1024 * 1024; // 1 MB
 const PDF_MIME_TYPE = "application/pdf";
 const PDF_MAGIC = "%PDF-";
 
@@ -65,7 +65,7 @@ export async function uploadResume(
     return { status: "error", message: "Please choose a resume file to upload." };
   }
   if (file.size > MAX_RESUME_SIZE_BYTES) {
-    return { status: "error", message: "Resume must be smaller than 5 MB." };
+    return { status: "error", message: "Resume must be smaller than 1 MB." };
   }
   if (!hasPdfExtensionAndMime(file)) {
     return { status: "error", message: "Please upload a PDF file (.pdf)." };
