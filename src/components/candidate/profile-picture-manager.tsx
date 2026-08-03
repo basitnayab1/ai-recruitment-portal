@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -13,7 +13,10 @@ import {
   type DeleteProfilePictureState,
   type UploadProfilePictureState,
 } from "@/lib/candidate/profile-picture-actions";
-import { PROFILE_PICTURE_ACCEPT } from "@/lib/candidate/profile-picture-constants";
+import {
+  isAllowedProfilePictureFile,
+  PROFILE_PICTURE_ACCEPT,
+} from "@/lib/candidate/profile-picture-constants";
 
 const uploadInitialState: UploadProfilePictureState = undefined;
 const deleteInitialState: DeleteProfilePictureState = undefined;
@@ -28,6 +31,7 @@ export function ProfilePictureManager({
   pictureUrl: string | null;
 }) {
   const router = useRouter();
+  const [clientError, setClientError] = useState<string | null>(null);
   const [uploadState, uploadAction, uploadPending] = useActionState(
     uploadProfilePicture,
     uploadInitialState
@@ -39,6 +43,7 @@ export function ProfilePictureManager({
 
   useEffect(() => {
     if (uploadState?.status === "success" || deleteState?.status === "success") {
+      setClientError(null);
       router.refresh();
     }
   }, [uploadState, deleteState, router]);
@@ -54,11 +59,28 @@ export function ProfilePictureManager({
         <div>
           <h3 className="text-sm font-medium text-white">Profile Picture</h3>
           <p className="mt-1 text-xs text-zinc-400">
-            JPG, PNG, or WEBP up to 5 MB. Large images are resized automatically.
+            JPG, PNG, or WEBP. Maximum file size: 1 MB. Large images are resized automatically.
           </p>
         </div>
 
-        <form action={uploadAction} className="space-y-3" noValidate>
+        <form
+          action={uploadAction}
+          className="space-y-3"
+          noValidate
+          onSubmit={(event) => {
+            const form = event.currentTarget;
+            const input = form.elements.namedItem("picture");
+            const file =
+              input instanceof HTMLInputElement && input.files?.[0] ? input.files[0] : null;
+            // Size is validated after server-side compression; only check type here.
+            if (file && !isAllowedProfilePictureFile(file)) {
+              event.preventDefault();
+              setClientError("Please upload a JPG, PNG, or WEBP image.");
+              return;
+            }
+            setClientError(null);
+          }}
+        >
           <div className="space-y-2">
             <Label htmlFor="picture">{showPicture ? "Replace picture" : "Upload picture"}</Label>
             <input
@@ -69,9 +91,11 @@ export function ProfilePictureManager({
               required={!showPicture}
               disabled={uploadPending}
               className={FILE_INPUT}
+              onChange={() => setClientError(null)}
             />
           </div>
 
+          {clientError ? <FormAlert variant="error">{clientError}</FormAlert> : null}
           {uploadState?.status === "error" ? (
             <FormAlert variant="error">{uploadState.message}</FormAlert>
           ) : null}

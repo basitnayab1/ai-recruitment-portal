@@ -52,9 +52,7 @@ export async function uploadProfilePicture(
     if (!(file instanceof File) || file.size === 0) {
       return { status: "error", message: "Please choose a profile picture to upload." };
     }
-    if (file.size > MAX_PROFILE_PICTURE_SIZE_BYTES) {
-      return { status: "error", message: "Profile picture must be smaller than 5 MB." };
-    }
+    // Validate type only up front. Size is checked after compression.
     if (!isAllowedProfilePictureFile(file)) {
       return { status: "error", message: "Please upload a JPG, PNG, or WEBP image." };
     }
@@ -65,6 +63,14 @@ export async function uploadProfilePicture(
         status: "error",
         message:
           "We couldn't process that image. Please try a different JPG, PNG, or WEBP file.",
+      };
+    }
+
+    // Final gate before Supabase Storage: processed/compressed output must be ≤ 1 MB.
+    if (processed.fileSize > MAX_PROFILE_PICTURE_SIZE_BYTES) {
+      return {
+        status: "error",
+        message: "Image could not be compressed below 1 MB. Please choose a smaller image.",
       };
     }
 

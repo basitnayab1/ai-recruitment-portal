@@ -2,6 +2,7 @@ import "server-only";
 
 import {
   ALLOWED_PROFILE_PICTURE_MIME_TYPES,
+  MAX_PROFILE_PICTURE_SIZE_BYTES,
   PROFILE_PICTURE_MAX_DIMENSION,
   type AllowedProfilePictureMimeType,
 } from "@/lib/candidate/profile-picture-constants";
@@ -43,10 +44,41 @@ function normalizeMimeType(file: File): AllowedProfilePictureMimeType | null {
   return null;
 }
 
+function buildFileName(file: File, mimeType: AllowedProfilePictureMimeType): string {
+  const baseName = file.name.replace(/\.[^.]+$/, "") || "profile-picture";
+  const sanitizedBaseName =
+    baseName.replace(/[^a-zA-Z0-9._-]/g, "_").slice(-80) || "profile-picture";
+  return `${sanitizedBaseName}.${extensionForMimeType(mimeType)}`;
+}
+
+async function buildResizedWebp(
+  sharp: typeof import("sharp").default,
+  inputBuffer: Buffer,
+  maxDimension: number,
+  quality: number
+): Promise<Buffer> {
+  let pipeline = sharp(inputBuffer, { failOn: "none" }).rotate();
+  const metadata = await pipeline.metadata();
+  const width = metadata.width ?? 0;
+  const height = metadata.height ?? 0;
+
+  // Existing resize behavior: fit inside PROFILE_PICTURE_MAX_DIMENSION (or a
+  // smaller dimension when further compression is required).
+  if (width > maxDimension || height > maxDimension) {
+    pipeline = pipeline.resize(maxDimension, maxDimension, {
+      fit: "inside",
+      withoutEnlargement: true,
+    });
+  }
+
+  return pipeline.webp({ quality }).toBuffer();
+}
+
 /**
- * Resize and normalize profile pictures before upload. Large images are
- * scaled down to fit within PROFILE_PICTURE_MAX_DIMENSION while preserving
- * aspect ratio. JPEG/PNG inputs are converted to WebP for smaller storage.
+ * Prepare a profile picture for upload.
+ * - Images already ≤ 1 MB are returned as-is after a readability check.
+ * - Larger images use the existing resize/WebP compression path (max dimension,
+ *   then lower quality / smaller dimensions) until under the limit.
  */
 export async function processProfilePicture(file: File): Promise<ProcessedProfilePicture | null> {
   const sourceMimeType = normalizeMimeType(file);
@@ -60,31 +92,57 @@ export async function processProfilePicture(file: File): Promise<ProcessedProfil
   // process and surface as "Failed to fetch" on later Server Actions.
   try {
     const sharp = (await import("sharp")).default;
-
     const inputBuffer = Buffer.from(await file.arrayBuffer());
-    let pipeline = sharp(inputBuffer, { failOn: "none" }).rotate();
 
-    const metadata = await pipeline.metadata();
-    const width = metadata.width ?? 0;
-    const height = metadata.height ?? 0;
-
-    if (width > PROFILE_PICTURE_MAX_DIMENSION || height > PROFILE_PICTURE_MAX_DIMENSION) {
-      pipeline = pipeline.resize(PROFILE_PICTURE_MAX_DIMENSION, PROFILE_PICTURE_MAX_DIMENSION, {
-        fit: "inside",
-        withoutEnlargement: true,
-      });
+    const metadata = await sharp(inputBuffer, { failOn: "none" }).metadata();
+    if (!metadata.width || !metadata.height) {
+      return null;
     }
 
-    const buffer = await pipeline.webp({ quality: 85 }).toBuffer();
+    // Already under the final size limit — upload without compression.
+    if (inputBuffer.byteLength <= MAX_PROFILE_PICTURE_SIZE_BYTES) {
+      return {
+        buffer: inputBuffer,
+        mimeType: sourceMimeType,
+        fileName: buildFileName(file, sourceMimeType),
+        fileSize: inputBuffer.byteLength,
+      };
+    }
+
+    // Existing behavior for oversized originals: max-dimension resize + WebP quality 85.
+    let buffer = await buildResizedWebp(
+      sharp,
+      inputBuffer,
+      PROFILE_PICTURE_MAX_DIMENSION,
+      85
+    );
+
+    // If still over 1 MB, keep compressing until under the limit.
+    if (buffer.byteLength > MAX_PROFILE_PICTURE_SIZE_BYTES) {
+      for (const quality of [75, 65, 55, 45, 35, 25]) {
+        buffer = await buildResizedWebp(
+          sharp,
+          inputBuffer,
+          PROFILE_PICTURE_MAX_DIMENSION,
+          quality
+        );
+        if (buffer.byteLength <= MAX_PROFILE_PICTURE_SIZE_BYTES) break;
+      }
+    }
+
+    if (buffer.byteLength > MAX_PROFILE_PICTURE_SIZE_BYTES) {
+      for (const dimension of [384, 256, 192, 128]) {
+        buffer = await buildResizedWebp(sharp, inputBuffer, dimension, 25);
+        if (buffer.byteLength <= MAX_PROFILE_PICTURE_SIZE_BYTES) break;
+      }
+    }
+
     const mimeType: AllowedProfilePictureMimeType = "image/webp";
-    const baseName = file.name.replace(/\.[^.]+$/, "") || "profile-picture";
-    const sanitizedBaseName =
-      baseName.replace(/[^a-zA-Z0-9._-]/g, "_").slice(-80) || "profile-picture";
 
     return {
       buffer,
       mimeType,
-      fileName: `${sanitizedBaseName}.${extensionForMimeType(mimeType)}`,
+      fileName: buildFileName(file, mimeType),
       fileSize: buffer.byteLength,
     };
   } catch (error) {
