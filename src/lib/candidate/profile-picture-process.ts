@@ -52,7 +52,7 @@ function buildFileName(file: File, mimeType: AllowedProfilePictureMimeType): str
 }
 
 async function buildResizedWebp(
-  sharp: typeof import("sharp").default,
+  sharp: typeof import("sharp"),
   inputBuffer: Buffer,
   maxDimension: number,
   quality: number
@@ -91,7 +91,8 @@ export async function processProfilePicture(file: File): Promise<ProcessedProfil
   // failures too — an uncaught sharp DLOPEN error can kill the Next.js
   // process and surface as "Failed to fetch" on later Server Actions.
   try {
-    const sharp = (await import("sharp")).default;
+    const sharpModule = await import("sharp");
+    const sharp: typeof import("sharp") = sharpModule.default;
     const inputBuffer = Buffer.from(await file.arrayBuffer());
 
     const metadata = await sharp(inputBuffer, { failOn: "none" }).metadata();
