@@ -1,5 +1,6 @@
 import "server-only";
 
+import sharp from "sharp";
 import {
   ALLOWED_PROFILE_PICTURE_MIME_TYPES,
   MAX_PROFILE_PICTURE_SIZE_BYTES,
@@ -51,25 +52,7 @@ function buildFileName(file: File, mimeType: AllowedProfilePictureMimeType): str
   return `${sanitizedBaseName}.${extensionForMimeType(mimeType)}`;
 }
 
-type SharpFactory = typeof import("sharp");
-
-function resolveSharpFactory(mod: unknown): SharpFactory {
-  if (typeof mod === "function") {
-    return mod as SharpFactory;
-  }
-  if (
-    typeof mod === "object" &&
-    mod !== null &&
-    "default" in mod &&
-    typeof (mod as { default: unknown }).default === "function"
-  ) {
-    return (mod as { default: SharpFactory }).default;
-  }
-  throw new Error("Invalid sharp module shape");
-}
-
 async function buildResizedWebp(
-  sharp: SharpFactory,
   inputBuffer: Buffer,
   maxDimension: number,
   quality: number
@@ -103,13 +86,7 @@ export async function processProfilePicture(file: File): Promise<ProcessedProfil
     return null;
   }
 
-  // Lazy-load sharp so unrelated server actions on the profile page are not
-  // crashed by a broken native sharp binary at module-eval time. Catch load
-  // failures too — an uncaught sharp DLOPEN error can kill the Next.js
-  // process and surface as "Failed to fetch" on later Server Actions.
   try {
-    // Compatible with both CommonJS and ESM builds (local + Vercel).
-    const sharp = resolveSharpFactory(await import("sharp"));
     const inputBuffer = Buffer.from(await file.arrayBuffer());
 
     const metadata = await sharp(inputBuffer, { failOn: "none" }).metadata();
@@ -128,29 +105,19 @@ export async function processProfilePicture(file: File): Promise<ProcessedProfil
     }
 
     // Existing behavior for oversized originals: max-dimension resize + WebP quality 85.
-    let buffer = await buildResizedWebp(
-      sharp,
-      inputBuffer,
-      PROFILE_PICTURE_MAX_DIMENSION,
-      85
-    );
+    let buffer = await buildResizedWebp(inputBuffer, PROFILE_PICTURE_MAX_DIMENSION, 85);
 
     // If still over 1 MB, keep compressing until under the limit.
     if (buffer.byteLength > MAX_PROFILE_PICTURE_SIZE_BYTES) {
       for (const quality of [75, 65, 55, 45, 35, 25]) {
-        buffer = await buildResizedWebp(
-          sharp,
-          inputBuffer,
-          PROFILE_PICTURE_MAX_DIMENSION,
-          quality
-        );
+        buffer = await buildResizedWebp(inputBuffer, PROFILE_PICTURE_MAX_DIMENSION, quality);
         if (buffer.byteLength <= MAX_PROFILE_PICTURE_SIZE_BYTES) break;
       }
     }
 
     if (buffer.byteLength > MAX_PROFILE_PICTURE_SIZE_BYTES) {
       for (const dimension of [384, 256, 192, 128]) {
-        buffer = await buildResizedWebp(sharp, inputBuffer, dimension, 25);
+        buffer = await buildResizedWebp(inputBuffer, dimension, 25);
         if (buffer.byteLength <= MAX_PROFILE_PICTURE_SIZE_BYTES) break;
       }
     }
