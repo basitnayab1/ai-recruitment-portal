@@ -17,7 +17,7 @@ import type { AIEmailContext } from "@/components/hr/email/ai-email-context";
 import { getInterviewByApplicationId } from "@/lib/hr/interview-data";
 import { resolveInterviewLocation } from "@/lib/hr/interviews";
 import { getInterviewQuestionsByApplicationId } from "@/lib/hr/interview-questions-data";
-import { BTN_PRIMARY, DETAIL_SECTION, PAGE_LINK_BACK, PAGE_TITLE } from "@/lib/ui/classes";
+import { BTN_PRIMARY, DETAIL_SECTION, PAGE_LINK_BACK, PAGE_TITLE, SURFACE_CARD } from "@/lib/ui/classes";
 import { formatIsoDateUTC } from "@/lib/format/display-dates";
 
 export const metadata: Metadata = {
@@ -316,10 +316,6 @@ export default async function HRApplicationDetailPage({
           </div>
 
           <div className={DETAIL_SECTION}>
-            <AIEmailAssistantCard context={emailContext} />
-          </div>
-
-          <div className={DETAIL_SECTION}>
             <h2 className="text-base font-semibold text-white">
               Status Management
             </h2>
@@ -335,6 +331,10 @@ export default async function HRApplicationDetailPage({
               />
             </div>
           </div>
+        </div>
+
+        <div className={`${SURFACE_CARD} p-8 sm:p-10 lg:col-span-2`}>
+          <AIEmailAssistantCard context={emailContext} />
         </div>
       </div>
 

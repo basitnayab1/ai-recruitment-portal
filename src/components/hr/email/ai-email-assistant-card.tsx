@@ -6,7 +6,6 @@ import { Mail } from "lucide-react";
 import { EMAIL_TYPE_LABELS } from "@/lib/ai/email-labels";
 import { EMAIL_TYPES, type EmailType } from "@/lib/ai/types";
 import type { AIEmailContext } from "@/components/hr/email/ai-email-context";
-import { BTN_OUTLINE } from "@/lib/ui/classes";
 
 const AIEmailDraftModal = dynamic(
   () =>
@@ -25,33 +24,35 @@ export function AIEmailAssistantCard({ context }: { context: AIEmailContext }) {
 
   return (
     <>
-      <div className="space-y-4">
-        <div className="flex items-start gap-3">
+      <div className="space-y-5 sm:space-y-6">
+        <div className="flex items-start gap-3 sm:gap-4">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 shadow-lg shadow-violet-500/20">
             <Mail className="h-5 w-5 text-white" aria-hidden="true" />
           </div>
-          <div>
+          <div className="min-w-0 flex-1">
             <h2 className="text-base font-semibold text-white">
               AI Email Assistant
             </h2>
-            <p className="mt-1 text-xs text-zinc-400">
+            <p className="mt-1 text-xs leading-relaxed text-zinc-400 sm:text-sm">
               Generate professional email drafts before sending. Nothing is sent until you confirm.
             </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
           {EMAIL_TYPES.map((type) => (
             <button
               key={type}
               type="button"
               onClick={() => openWithType(type)}
-              className={`${BTN_OUTLINE} h-auto min-h-11 justify-start px-4 py-2.5 text-left text-sm`}
+              className="inline-flex h-14 w-full min-w-0 items-center justify-center gap-1.5 rounded-full border border-white/15 bg-transparent px-3 py-2 text-center text-sm font-semibold leading-tight whitespace-normal text-zinc-200 transition-all hover:border-violet-400/40 hover:bg-violet-500/10 hover:text-violet-200 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-500/15"
             >
-              <span className="mr-1.5" aria-hidden="true">
+              <span className="shrink-0" aria-hidden="true">
                 ✨
               </span>
-              {EMAIL_TYPE_LABELS[type]}
+              <span className="min-w-0 text-center leading-tight">
+                {EMAIL_TYPE_LABELS[type]}
+              </span>
             </button>
           ))}
         </div>
